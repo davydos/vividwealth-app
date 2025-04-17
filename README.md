@@ -48,23 +48,21 @@ src/
 
 - Node.js (v18+)
 - npm or yarn
-- Expo CLI (`npm install -g expo-cli`)
-- iOS Simulator or Android Emulator (optional for local testing)
-- Expo Go app on your physical device (for easiest testing)
+- Expo Go app on your physical device (for testing)
 
 ### Installation
 
+1. Install dependencies:
 ```bash
-# Clone the repository
-git clone https://github.com/vividwealth/vividwealth-app.git
-cd vividwealth-app
-
-# Install dependencies
 npm install
-
-# Start the development server
-npm start
 ```
+
+2. Run on device:
+```bash
+npm run dev
+```
+
+3. Scan the QR code with Expo Go app on your device
 
 ### Development Options
 
