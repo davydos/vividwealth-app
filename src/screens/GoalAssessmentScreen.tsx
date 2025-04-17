@@ -1,12 +1,41 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
+import { calculateTimeframe } from '../utils/timeframe';
 
 export const GoalAssessmentScreen = () => {
   const [goal, setGoal] = useState('');
 
-  const handleNext = () => {
-    // Handle next action here
-    console.log('Goal:', goal);
+  const handleNext = async () => {
+    if (!goal.trim()) {
+      Alert.alert('Error', 'Please enter a goal');
+      return;
+    }
+
+    try {
+      // Calculate timeframe based on goal
+      const timeframe = calculateTimeframe(goal);
+      
+      // Save goal and timeframe to SecureStore
+      await SecureStore.setItemAsync('user_goal', goal);
+      await SecureStore.setItemAsync('goal_timeframe', String(timeframe));
+      
+      console.log('Goal saved:', goal);
+      console.log('Timeframe (days):', timeframe);
+      
+      // Clear input after saving
+      setGoal('');
+      
+      // Show confirmation
+      Alert.alert(
+        'Goal Saved',
+        `Your goal has been saved. Estimated timeframe: ${timeframe} days.`,
+        [{ text: 'OK' }]
+      );
+    } catch (error) {
+      console.error('Error saving goal:', error);
+      Alert.alert('Error', 'Failed to save your goal. Please try again.');
+    }
   };
 
   return (
