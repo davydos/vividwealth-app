@@ -46,9 +46,11 @@ src/
 
 ### Prerequisites
 
-- Node.js (v16+)
-- Yarn or npm
-- iOS Simulator or Android Emulator
+- Node.js (v18+)
+- npm or yarn
+- Expo CLI (`npm install -g expo-cli`)
+- iOS Simulator or Android Emulator (optional for local testing)
+- Expo Go app on your physical device (for easiest testing)
 
 ### Installation
 
@@ -64,17 +66,20 @@ npm install
 npm start
 ```
 
-### Development
+### Development Options
 
 ```bash
-# Run on iOS
+# Run on iOS Simulator
 npm run ios
 
-# Run on Android
+# Run on Android Emulator
 npm run android
 
 # Run on Web
 npm run web
+
+# Run with Expo Go (scan QR code with your device)
+npm start
 ```
 
 ## Branching Strategy
