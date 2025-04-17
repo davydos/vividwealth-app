@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User as FirebaseUser } from 'firebase/auth';
+import { User as FirebaseUser, getAuth, updateProfile } from 'firebase/auth';
 import { User, UserRole, AuthState } from '../types';
 import * as secureStorage from '../utils/secureStorage';
 import * as firebaseService from '../services/firebase';
@@ -169,8 +169,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const userCredential = await firebaseService.signUpWithEmail(email, password);
       const firebaseUser = userCredential.user;
       
-      // Update user profile with display name
-      await firebaseUser.updateProfile({
+      // Update user profile with display name using Firebase auth method
+      await updateProfile(firebaseUser, {
         displayName: displayName,
       });
       

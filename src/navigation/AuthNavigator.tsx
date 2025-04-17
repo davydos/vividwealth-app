@@ -1,6 +1,7 @@
 import React from 'react';
-import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
-import { NavigationRoutes } from '../types';
+import { createStackNavigator, TransitionPresets, CardStyleInterpolator } from '@react-navigation/stack';
+import { Animated } from 'react-native';
+import { NavigationRoutes, AuthStackParamList } from '../types';
 
 // Import screens 
 import { LoginScreen } from '../screens/auth/LoginScreen';
@@ -8,20 +9,14 @@ import { SignupScreen } from '../screens/auth/SignupScreen';
 import { ForgotPasswordScreen } from '../screens/auth/ForgotPasswordScreen';
 import { WelcomeScreen } from '../screens/auth/WelcomeScreen';
 
-export type AuthStackParamList = {
-  Welcome: undefined;
-  Login: undefined;
-  Signup: undefined;
-  ForgotPassword: undefined;
-};
-
 const Stack = createStackNavigator<AuthStackParamList>();
 
 // Custom transition configuration for luxury feel
-const fadeTransition = {
+const fadeTransition: {
+  cardStyleInterpolator: CardStyleInterpolator;
+} = {
   ...TransitionPresets.SlideFromRightIOS,
-  cardStyle: { backgroundColor: '#FFFFFF' },
-  cardStyleInterpolator: ({ current: { progress } }: any) => ({
+  cardStyleInterpolator: ({ current: { progress } }) => ({
     cardStyle: {
       opacity: progress.interpolate({
         inputRange: [0, 1],
@@ -47,6 +42,7 @@ export const AuthNavigator = () => {
         ...TransitionPresets.SlideFromRightIOS,
       }}
       initialRouteName="Welcome"
+      id="auth-stack"
     >
       <Stack.Screen 
         name="Welcome" 

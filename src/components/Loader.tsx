@@ -3,7 +3,9 @@ import { View, Text, ActivityIndicator, ViewStyle } from 'react-native';
 import LottieView from 'lottie-react-native';
 import { styled } from 'nativewind';
 import { COLORS } from '../constants';
-import loadingAnimation from '../assets/animations/loading.json';
+
+// Use require for animations to avoid TypeScript import errors
+const loadingAnimation = require('../../assets/loading.json');
 
 interface LoaderProps {
   type?: 'default' | 'fullscreen' | 'inline' | 'skeleton';

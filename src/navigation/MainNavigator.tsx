@@ -1,6 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationRoutes } from '../types';
+import { NavigationRoutes, MainTabParamList } from '../types';
 import { COLORS } from '../constants';
 import { View, Text } from 'react-native';
 import { styled } from 'nativewind';
@@ -13,14 +13,6 @@ import SubscriptionScreen from '../screens/SubscriptionScreen';
 const StudioScreen = () => null;
 const ProfileScreen = () => null;
 const SettingsScreen = () => null;
-
-export type MainTabParamList = {
-  Dashboard: undefined;
-  Studio: undefined;
-  Subscription: undefined;
-  Profile: undefined;
-  Settings: undefined;
-};
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 const StyledView = styled(View);
@@ -49,6 +41,7 @@ export const MainNavigator = () => {
           fontWeight: '500',
         },
       }}
+      id="main-tab"
     >
       <Tab.Screen 
         name="Dashboard" 

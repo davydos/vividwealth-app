@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { NavigationRoutes } from '../types';
+import { NavigationRoutes, RootStackParamList } from '../types';
 import { COLORS } from '../constants';
 import { useAuth } from '../contexts';
 
@@ -11,14 +11,22 @@ import { MainNavigator } from './MainNavigator';
 import { SplashScreen } from '../screens/SplashScreen';
 import { OnboardingScreen } from '../screens/OnboardingScreen';
 
-export type RootStackParamList = {
-  [NavigationRoutes.SPLASH]: undefined;
-  [NavigationRoutes.ONBOARDING]: undefined;
-  [NavigationRoutes.AUTH]: undefined;
-  [NavigationRoutes.MAIN]: undefined;
-};
-
 const Stack = createStackNavigator<RootStackParamList>();
+
+// Create proper theme with font configuration
+const theme = {
+  ...DefaultTheme,
+  dark: false,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: COLORS.PRIMARY,
+    background: COLORS.BACKGROUND,
+    card: COLORS.BACKGROUND,
+    text: COLORS.TEXT.PRIMARY,
+    border: COLORS.TEXT.TERTIARY,
+    notification: COLORS.ACCENT,
+  },
+};
 
 export const RootNavigator = () => {
   const { authState } = useAuth();
@@ -53,20 +61,8 @@ export const RootNavigator = () => {
   }
 
   return (
-    <NavigationContainer
-      theme={{
-        dark: false,
-        colors: {
-          primary: COLORS.PRIMARY,
-          background: COLORS.BACKGROUND,
-          card: COLORS.BACKGROUND,
-          text: COLORS.TEXT.PRIMARY,
-          border: COLORS.TEXT.TERTIARY,
-          notification: COLORS.ACCENT,
-        },
-      }}
-    >
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <NavigationContainer theme={theme}>
+      <Stack.Navigator screenOptions={{ headerShown: false }} id="root-stack">
         {!hasSeenOnboarding ? (
           <Stack.Screen 
             name={NavigationRoutes.ONBOARDING} 
