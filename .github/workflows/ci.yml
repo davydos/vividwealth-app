@@ -125,6 +125,17 @@ jobs:
           echo "PROFILE=preview" >> $GITHUB_ENV
           echo "Using staging environment for test build"
       
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+
+      - name: EAS login
+        run: eas login --token ${{ secrets.EXPO_TOKEN }} --non-interactive
+
+      - name: Set EAS project ID
+        env:
+          EAS_PROJECT_ID: vividwealth  # app name from package.json
+        run: echo "EAS_PROJECT_ID set to $EAS_PROJECT_ID"
+      
       - name: Build Preview
         run: npx eas-cli build --profile preview --platform all --non-interactive --no-wait
         env:
