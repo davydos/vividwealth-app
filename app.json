@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "VividWealth",
+    "slug": "VividWealth",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "projectId": "a7224124-6885-4d37-bd08-bb9ac969cf17",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.smrteth.vividwealth",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.smrteth.vividwealth"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "a7224124-6885-4d37-bd08-bb9ac969cf17"
+      }
+    },
+    "owner": "smrteth",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/a7224124-6885-4d37-bd08-bb9ac969cf17"
+    }
+  }
+}
