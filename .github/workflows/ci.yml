@@ -140,7 +140,7 @@ jobs:
       - name: Import Android Credentials
         run: |
           echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > keystore.jks
-          npx eas-cli credentials:upload --platform android --keystore-path keystore.jks \
+          npx eas credentials update --keystore-path keystore.jks \
             --keystore-alias $ANDROID_KEY_ALIAS \
             --keystore-password $ANDROID_KEYSTORE_PASSWORD \
             --key-password $ANDROID_KEY_PASSWORD
