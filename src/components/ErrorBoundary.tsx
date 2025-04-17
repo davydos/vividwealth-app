@@ -74,7 +74,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </StyledText>
             
             <StyledText className="text-base text-primary/70 text-center mb-8">
-              We're sorry for the inconvenience. Please try again.
+              We&apos;re sorry for the inconvenience. Please try again.
             </StyledText>
             
             {__DEV__ && this.state.error && (
