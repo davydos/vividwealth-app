@@ -1,7 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { styled } from 'nativewind';
-import { COLORS } from '../constants';
 import Animated, { 
   FadeIn,
   SlideInUp,
