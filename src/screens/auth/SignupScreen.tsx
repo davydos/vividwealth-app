@@ -34,14 +34,10 @@ const StyledAnimatedView = styled(Animated.View);
 const signupSchema = z.object({
   displayName: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email'),
-  password: z.string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
   confirmPassword: z.string(),
   referralCode: z.string().optional(),
-}).refine(data => data.password === data.confirmPassword, {
+}).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
 });
@@ -77,22 +73,21 @@ export const SignupScreen = () => {
 
   const validateField = (field: keyof SignupFormData, value: string) => {
     try {
-      // Special case for confirmPassword, which needs to be validated against password
+      // Get the appropriate schema for this field
+      let fieldSchema: z.ZodType<any>;
+      
       if (field === 'confirmPassword') {
-        if (value !== formData.password) {
-          setErrors((prev) => ({
-            ...prev,
-            [field]: "Passwords don't match",
-          }));
-          return;
-        } else {
-          setErrors((prev) => ({ ...prev, [field]: undefined }));
-          return;
-        }
+        // For confirmPassword, we need to check against password
+        fieldSchema = z.string().refine(
+          (val) => val === formData.password,
+          { message: "Passwords don't match" }
+        );
+      } else {
+        // For other fields, access the schema safely using type assertion
+        const shape = signupSchema._def.shape;
+        fieldSchema = shape[field as keyof typeof shape];
       }
       
-      // For other fields, use the schema
-      const fieldSchema = signupSchema.shape[field] as z.ZodType<any>;
       fieldSchema.parse(value);
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     } catch (error) {
@@ -176,7 +171,7 @@ export const SignupScreen = () => {
     >
       <StyledScrollView 
         className="flex-1" 
-        contentContainerClassName="p-6 pb-12"
+        contentContainerStyle={{ padding: 24, paddingBottom: 48 }}
         keyboardShouldPersistTaps="handled"
       >
         <StyledAnimatedView 
