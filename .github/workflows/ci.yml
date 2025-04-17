@@ -28,6 +28,7 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
       
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
@@ -62,6 +63,7 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
       
       - name: Run npm audit
         run: npm audit --production || true
@@ -87,6 +89,7 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
       
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
