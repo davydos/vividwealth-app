@@ -508,3 +508,10 @@ The workflows are now properly aligned with the EAS build profiles as defined in
    - Document how to use the new development workflow
 
 The CI/CD workflow alignment is now complete and ready for the next sprint. Once the authentication issues are resolved by adding the proper secrets, the workflows will function as designed. 
+
+### New Android Credentials Error  
+• **Error:** "Generating a new Keystore is not supported in --non‑interactive mode"  
+• **Meaning:** EAS reached the Android credentials step in CI and needs a keystore, which cannot be auto‑generated non‑interactively.  
+• **Next Steps:**  
+  1. Generate your Android keystore locally and upload it to Expo (expo credentials:manager –platform android).  
+  2. Store the keystore file and passwords in GitHub Secrets, then add a CI step to `expo credentials:pull` or `expo credentials:import` using those secrets before the build.  
