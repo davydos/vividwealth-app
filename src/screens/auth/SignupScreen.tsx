@@ -61,42 +61,33 @@ export const SignupScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showReferralField, setShowReferralField] = useState(false);
 
-  const handleChange = (field: keyof SignupFormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    validateField(field, value);
+  const handleChange = (name: keyof SignupFormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    validateField(name, value);
   };
 
-  const handleBlur = (field: keyof SignupFormData) => {
-    setTouched((prev) => ({ ...prev, [field]: true }));
-    validateField(field, formData[field]);
+  const handleBlur = (name: keyof SignupFormData) => {
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    validateField(name, formData[name]);
   };
 
-  const validateField = (field: keyof SignupFormData, value: string) => {
+  const validateField = (name: string, value: string) => {
+    const schema = signupSchema.pick({ [name]: true });
+    
+    // Safely extract shape from the schema definition
+    const baseSchema = schema._def?.schema || schema;
+    const fieldSchema = baseSchema._def?.shape?.[name];
+    
     try {
-      // Get the appropriate schema for this field
-      let fieldSchema: z.ZodType<any>;
-      
-      if (field === 'confirmPassword') {
-        // For confirmPassword, we need to check against password
-        fieldSchema = z.string().refine(
-          (val) => val === formData.password,
-          { message: "Passwords don't match" }
-        );
-      } else {
-        // For other fields, access the schema safely using type assertion
-        const shape = signupSchema._def.shape;
-        fieldSchema = shape[field as keyof typeof shape];
-      }
-      
-      fieldSchema.parse(value);
-      setErrors((prev) => ({ ...prev, [field]: undefined }));
+      schema.parse({ [name]: value });
+      setErrors(prev => ({ ...prev, [name]: "" }));
+      return true;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        setErrors((prev) => ({
-          ...prev,
-          [field]: error.errors[0]?.message || `Invalid ${field}`,
-        }));
+        const errorMessage = error.errors[0]?.message || "";
+        setErrors(prev => ({ ...prev, [name]: errorMessage }));
       }
+      return false;
     }
   };
 
