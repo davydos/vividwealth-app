@@ -131,10 +131,14 @@ jobs:
       - name: EAS login
         run: eas login --token ${{ secrets.EXPO_TOKEN }} --non-interactive
 
-      - name: Set EAS project ID
-        env:
-          EAS_PROJECT_ID: vividwealth  # app name from package.json
-        run: echo "EAS_PROJECT_ID set to $EAS_PROJECT_ID"
+      - name: Initialize EAS project
+        run: |
+          # Get project ID from app.json/app.config.js
+          PROJECT_ID=$(node -e "try { const appConfig = require('./app.json'); console.log(appConfig.expo.slug || 'vividwealth'); } catch(e) { console.log('vividwealth'); }")
+          echo "EAS_PROJECT_ID=$PROJECT_ID" >> $GITHUB_ENV
+          
+          # Initialize EAS project if needed
+          eas project:init --id $PROJECT_ID --non-interactive || echo "Project already initialized"
       
       - name: Build Preview
         run: npx eas-cli build --profile preview --platform all --non-interactive --no-wait
