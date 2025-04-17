@@ -1,8 +1,10 @@
 import express from 'express';
 import { spawn } from 'child_process';
+import cors from 'cors';
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 app.post('/generate-video', async (req, res) => {
   const { prompt } = req.body;
