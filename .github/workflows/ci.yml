@@ -27,12 +27,14 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'npm'
       
-      - uses: actions/cache@v3
+      - name: Cache node modules
+        uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}-v1
+          restore-keys: |
+            ${{ runner.os }}-node-
       
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
@@ -66,12 +68,14 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'npm'
       
-      - uses: actions/cache@v3
+      - name: Cache node modules
+        uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}-v1
+          restore-keys: |
+            ${{ runner.os }}-node-
       
       - name: Run npm audit
         run: npm audit --production || true
@@ -96,12 +100,14 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'npm'
       
-      - uses: actions/cache@v3
+      - name: Cache node modules
+        uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}-v1
+          restore-keys: |
+            ${{ runner.os }}-node-
       
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
