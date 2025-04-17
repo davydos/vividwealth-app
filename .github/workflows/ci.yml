@@ -1,6 +1,6 @@
 # CI workflow for VividWealth app
 # Runs on push/PR to main and develop branches
-# Required secrets: CODECOV_TOKEN, EXPO_TOKEN, EXPO_USERNAME, EXPO_PASSWORD
+# Required secrets: CODECOV_TOKEN, EXPO_TOKEN
 
 name: VividWealth CI
 
@@ -101,11 +101,6 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
       
-      - name: Expo login
-        run: |
-          echo "Using Expo CLI to login"
-          npx expo login -u ${{ secrets.EXPO_USERNAME }} -p ${{ secrets.EXPO_PASSWORD }} --non-interactive
-          
       - name: Set Environment Variables
         run: |
           echo "APP_ENV=staging" >> $GITHUB_ENV
