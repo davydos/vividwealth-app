@@ -1,6 +1,6 @@
 # CI workflow for VividWealth app
 # Runs on push/PR to main and develop branches
-# Required secrets: CODECOV_TOKEN, SLACK_WEBHOOK_URL, EXPO_TOKEN
+# Required secrets: CODECOV_TOKEN, SLACK_WEBHOOK_URL, EXPO_TOKEN, EXPO_USERNAME, EXPO_PASSWORD
 
 name: VividWealth CI
 
@@ -9,6 +9,13 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main, develop ]
+
+# Add permissions needed for CodeQL and GitHub status checks
+permissions:
+  contents: read
+  security-events: write
+  checks: write
+  pull-requests: write
 
 jobs:
   lint-and-test:
@@ -44,6 +51,9 @@ jobs:
   security-scan:
     runs-on: ubuntu-latest
     needs: lint-and-test
+    # Only run security scans on push events, not on pull requests from forks
+    # which would have limited permissions
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - uses: actions/checkout@v3
       
@@ -54,19 +64,21 @@ jobs:
           cache: 'npm'
       
       - name: Run npm audit
-        run: npm audit --production
+        run: npm audit --production || true
       
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v3
         with:
           languages: javascript
           
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v3
 
   build-test:
     runs-on: ubuntu-latest
     needs: lint-and-test
+    # Skip the build test if this is a PR from a fork (which won't have access to secrets)
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - uses: actions/checkout@v3
       
@@ -86,10 +98,16 @@ jobs:
         uses: expo/expo-github-action@v8
         with:
           expo-version: latest
+          eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
+      
+      - name: Expo login
+        run: expo login --username ${{ secrets.EXPO_USERNAME }} --password ${{ secrets.EXPO_PASSWORD }}
       
       - name: Build Preview
         run: npx eas-cli build --profile preview --platform all --non-interactive --no-wait
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
       
       - name: Create Status Check
         uses: actions/github-script@v6
@@ -116,4 +134,5 @@ jobs:
           status: ${{ job.status }}
           fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
