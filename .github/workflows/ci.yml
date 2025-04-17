@@ -140,7 +140,8 @@ jobs:
       - name: Import Android Credentials
         run: |
           echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > keystore.jks
-          npx eas credentials update --keystore-path keystore.jks \
+          # Using npx eas-cli directly with the appropriate command for non-interactive environments
+          npx eas-cli credentials:manager --platform android --keystore-path keystore.jks \
             --keystore-alias $ANDROID_KEY_ALIAS \
             --keystore-password $ANDROID_KEYSTORE_PASSWORD \
             --key-password $ANDROID_KEY_PASSWORD
@@ -148,7 +149,7 @@ jobs:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
       
       - name: Build Preview
-        run: npx eas-cli build --profile preview --platform all --non-interactive --no-wait
+        run: npx eas-cli build --profile preview --platform ios --non-interactive --no-wait
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
       
