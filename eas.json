@@ -3,7 +3,6 @@
     "version": ">= 3.13.3",
     "appVersionSource": "remote"
   },
-  "projectId": "a7224124-6885-4d37-bd08-bb9ac969cf17",
   "build": {
     "development": {
       "developmentClient": true,
@@ -19,8 +18,7 @@
       "env": {
         "APP_ENV": "development"
       },
-      "channel": "development",
-      "projectId": "a7224124-6885-4d37-bd08-bb9ac969cf17"
+      "channel": "development"
     },
     "preview": {
       "distribution": "internal",
@@ -36,8 +34,7 @@
         "APP_ENV": "staging"
       },
       "channel": "staging",
-      "autoIncrement": true,
-      "projectId": "a7224124-6885-4d37-bd08-bb9ac969cf17"
+      "autoIncrement": true
     },
     "production": {
       "ios": {
@@ -51,8 +48,7 @@
         "APP_ENV": "production"
       },
       "channel": "production",
-      "autoIncrement": true,
-      "projectId": "a7224124-6885-4d37-bd08-bb9ac969cf17"
+      "autoIncrement": true
     }
   },
   "submit": {
