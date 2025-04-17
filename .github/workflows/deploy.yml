@@ -1,0 +1,101 @@
+# Deploy workflow for VividWealth app
+# Runs on tag releases or manual trigger
+# Required secrets: EXPO_TOKEN, SLACK_WEBHOOK_URL, GITHUB_TOKEN
+
+name: VividWealth Deploy
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  deploy:
+    name: Deploy to ${{ github.event.inputs.environment || 'production' }}
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install Dependencies
+        run: npm ci
+      
+      - name: Install Expo CLI
+        run: npm install -g eas-cli
+      
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      
+      - name: Set Version from Tag
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
+          
+          # Update app.json with the version
+          jq ".expo.version = \"$VERSION\" | .expo.ios.buildNumber = \"$VERSION\" | .expo.android.versionCode = $(echo $VERSION | tr -d '.' | sed 's/^[0]*//')" app.json > app.json.tmp
+          mv app.json.tmp app.json
+      
+      - name: Build Production App
+        if: github.event.inputs.environment == 'production' || startsWith(github.ref, 'refs/tags/')
+        run: npx eas-cli build --platform all --profile production --auto-submit --non-interactive
+      
+      - name: Build Staging App
+        if: github.event.inputs.environment == 'staging' && !startsWith(github.ref, 'refs/tags/')
+        run: npx eas-cli build --platform all --profile preview --non-interactive
+      
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ env.APP_VERSION }}
+          body_path: CHANGELOG.md
+          draft: false
+          prerelease: false
+          files: |
+            *.apk
+            *.ipa
+            *.aab
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Notify Deployment Success
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+          text: ":rocket: Successfully deployed VividWealth app version ${{ env.APP_VERSION || github.sha }} to ${{ github.event.inputs.environment || 'production' }}!"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      
+      - name: Notify Deployment Failure
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+          text: ":x: Failed to deploy VividWealth app to ${{ github.event.inputs.environment || 'production' }}!"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 

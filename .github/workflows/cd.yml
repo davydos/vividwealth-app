@@ -1,0 +1,84 @@
+# CD workflow for VividWealth app
+# Runs on push to main branch and tag releases
+# Required secrets: EXPO_TOKEN, SLACK_WEBHOOK_URL
+
+name: VividWealth CD
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+      
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      
+      - name: Determine environment
+        id: determine-env
+        run: |
+          if [[ $GITHUB_REF == refs/tags/v* ]]; then
+            echo "ENV=production" >> $GITHUB_ENV
+            echo "PROFILE=production" >> $GITHUB_ENV
+          else
+            echo "ENV=preview" >> $GITHUB_ENV
+            echo "PROFILE=preview" >> $GITHUB_ENV
+          fi
+      
+      - name: Build & Submit
+        run: |
+          npx eas-cli build --platform all --profile ${{ env.PROFILE }} --non-interactive
+          npx eas-cli submit --platform all --profile ${{ env.PROFILE }} --non-interactive
+      
+      - name: Create Release (for tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v1
+        with:
+          generate_release_notes: true
+          files: |
+            *.aab
+            *.apk
+            *.ipa
+            *.zip
+      
+      - name: Notify Team
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()
+      
+      - name: Archive Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: release-${{ github.ref_name }}
+          path: |
+            *.aab
+            *.apk
+            *.ipa
+            *.zip
+          retention-days: 90 

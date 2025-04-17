@@ -1,0 +1,97 @@
+# Rollback workflow for VividWealth app
+# Triggered manually to roll back to a previous version
+# Required secrets: EXPO_TOKEN, SLACK_WEBHOOK_URL
+
+name: VividWealth Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag to roll back to (e.g., v1.0.0)'
+        required: true
+        type: string
+      confirm:
+        description: 'Type "CONFIRM" to proceed with rollback'
+        required: true
+        type: string
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check confirmation
+        if: github.event.inputs.confirm != 'CONFIRM'
+        run: |
+          echo "Rollback not confirmed. Please type 'CONFIRM' in the confirm field to proceed."
+          exit 1
+          
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          
+      - name: Validate version tag
+        run: |
+          if ! git tag -l | grep -q "^${{ github.event.inputs.version }}$"; then
+            echo "Version tag ${{ github.event.inputs.version }} does not exist."
+            echo "Available tags:"
+            git tag -l "v*" --sort=-v:refname | head -10
+            exit 1
+          fi
+  
+  rollback:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          
+      - name: Checkout version
+        run: git checkout ${{ github.event.inputs.version }}
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+      
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      
+      - name: Build rollback version
+        run: npx eas-cli build --platform all --profile production --non-interactive
+      
+      - name: Create rollback release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: "Rollback to ${{ github.event.inputs.version }}"
+          tag_name: "rollback-${{ github.event.inputs.version }}-${{ github.run_id }}"
+          body: "This is an automated rollback to version ${{ github.event.inputs.version }}."
+          draft: false
+          prerelease: false
+          files: |
+            *.apk
+            *.ipa
+            *.aab
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Notify Rollback
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+          text: ":warning: VividWealth app has been rolled back to version ${{ github.event.inputs.version }}!"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always() 
