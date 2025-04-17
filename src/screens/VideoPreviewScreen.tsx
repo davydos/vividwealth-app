@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
-import { generateVideo, checkVideoStatus, VideoGenerationResult } from '../utils/videoGenerationClient';
+import { generateVisualization } from '../utils/videoGenerator';
 import { calculateTimeframe } from '../utils/timeframe';
 
 interface VideoPreviewScreenProps {
@@ -14,51 +14,29 @@ interface VideoPreviewScreenProps {
 
 export const VideoPreviewScreen = ({ route, navigation }: VideoPreviewScreenProps) => {
   const { goal } = route.params;
-  const [videoResult, setVideoResult] = useState<VideoGenerationResult | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
-    const initiateVideoGeneration = async () => {
+    const initiateVisualization = async () => {
       try {
         setLoading(true);
         // Calculate timeframe based on goal
         const timeframeDays = calculateTimeframe(goal);
         
-        // Start video generation
-        const result = await generateVideo({
-          goal,
-          timeframeDays,
-          style: 'luxury',
-          duration: 30,
-          resolution: '1080p'
-        });
-        
-        setVideoResult(result);
-        
-        // Poll for status updates
-        const intervalId = setInterval(async () => {
-          if (!result.id) return;
-          
-          const statusResult = await checkVideoStatus(result.id);
-          setVideoResult(statusResult);
-          
-          if (['completed', 'failed'].includes(statusResult.status)) {
-            clearInterval(intervalId);
-            setLoading(false);
-          }
-        }, 5000);
-        
-        // Cleanup interval on unmount
-        return () => clearInterval(intervalId);
+        // Generate visualization
+        const url = await generateVisualization(goal, timeframeDays);
+        setVideoUrl(url);
+        setLoading(false);
       } catch (err) {
-        console.error('Failed to generate video:', err);
-        setError('Failed to generate visualization video. Please try again.');
+        console.error('Failed to generate visualization:', err);
+        setError('Failed to generate your magical visualization. Please try again.');
         setLoading(false);
       }
     };
     
-    initiateVideoGeneration();
+    initiateVisualization();
   }, [goal]);
   
   const handleRetry = async () => {
@@ -67,14 +45,10 @@ export const VideoPreviewScreen = ({ route, navigation }: VideoPreviewScreenProp
     
     try {
       const timeframeDays = calculateTimeframe(goal);
-      const result = await generateVideo({
-        goal,
-        timeframeDays,
-        style: 'luxury'
-      });
-      setVideoResult(result);
+      const url = await generateVisualization(goal, timeframeDays);
+      setVideoUrl(url);
     } catch (err) {
-      setError('Failed to regenerate video. Please try again later.');
+      setError('Failed to generate visualization. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -82,50 +56,44 @@ export const VideoPreviewScreen = ({ route, navigation }: VideoPreviewScreenProp
   
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Goal Visualization</Text>
+      <Text style={styles.title}>Manifest Your Visualization</Text>
       
       <View style={styles.previewContainer}>
         {loading ? (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#007AFF" />
             <Text style={styles.loadingText}>
-              {videoResult?.status === 'pending' 
-                ? 'Preparing your visualization...' 
-                : 'Generating your luxury visualization...'}
+              Creating your magical visualization...
             </Text>
-            {videoResult?.estimatedCompletionTime && (
-              <Text style={styles.estimatedTime}>
-                Estimated time: {Math.ceil(videoResult.estimatedCompletionTime / 60)} minute(s)
-              </Text>
-            )}
           </View>
         ) : error ? (
           <View style={styles.errorContainer}>
             <Text style={styles.errorText}>{error}</Text>
             <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
-              <Text style={styles.retryButtonText}>Retry</Text>
+              <Text style={styles.retryButtonText}>Generate My Visualization</Text>
             </TouchableOpacity>
           </View>
         ) : (
           <View style={styles.videoContainer}>
-            {videoResult?.status === 'completed' ? (
+            {videoUrl ? (
               <React.Fragment>
-                <Text style={styles.successText}>Your visualization is ready!</Text>
+                <Text style={styles.successText}>Your magical visualization is ready!</Text>
                 {/* In a real app, this would be a Video component */}
                 <View style={styles.videoPlaceholder}>
                   <Text style={styles.placeholderText}>Video Player</Text>
                   <Text style={styles.goalText}>Goal: {goal}</Text>
+                  <Text style={styles.urlText}>URL: {videoUrl}</Text>
                 </View>
                 <TouchableOpacity 
                   style={styles.shareButton}
-                  onPress={() => console.log('Share video', videoResult.url)}
+                  onPress={() => console.log('Share video', videoUrl)}
                 >
                   <Text style={styles.shareButtonText}>Share Your Vision</Text>
                 </TouchableOpacity>
               </React.Fragment>
             ) : (
               <Text style={styles.failedText}>
-                Video generation failed. Please try again.
+                Visualization generation failed. Please try again.
               </Text>
             )}
           </View>
@@ -216,6 +184,11 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 14,
     color: '#666',
+  },
+  urlText: {
+    marginTop: 5,
+    fontSize: 12,
+    color: '#888',
   },
   shareButton: {
     backgroundColor: '#1E90FF',
