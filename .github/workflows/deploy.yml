@@ -1,6 +1,6 @@
 # Deploy workflow for VividWealth app
 # Runs on tag releases or manual trigger
-# Required secrets: EXPO_TOKEN, SLACK_WEBHOOK_URL, GITHUB_TOKEN
+# Required secrets: EXPO_TOKEN, SLACK_WEBHOOK_URL, GITHUB_TOKEN, APPLE_ID, ASC_APP_ID, APPLE_TEAM_ID, GOOGLE_SERVICE_ACCOUNT_KEY
 
 name: VividWealth Deploy
 
@@ -48,6 +48,18 @@ jobs:
           expo-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
       
+      - name: Set Environment Variables
+        run: |
+          if [[ "${{ github.event.inputs.environment }}" == "staging" || -z "${{ github.event.inputs.environment }}" && ! "${{ github.ref }}" =~ ^refs/tags/v ]]; then
+            echo "APP_ENV=staging" >> $GITHUB_ENV
+            echo "PROFILE=preview" >> $GITHUB_ENV
+            echo "Using staging environment with preview profile"
+          else
+            echo "APP_ENV=production" >> $GITHUB_ENV
+            echo "PROFILE=production" >> $GITHUB_ENV
+            echo "Using production environment with production profile"
+          fi
+      
       - name: Set Version from Tag
         if: startsWith(github.ref, 'refs/tags/')
         run: |
@@ -58,12 +70,44 @@ jobs:
           jq ".expo.version = \"$VERSION\" | .expo.ios.buildNumber = \"$VERSION\" | .expo.android.versionCode = $(echo $VERSION | tr -d '.' | sed 's/^[0]*//')" app.json > app.json.tmp
           mv app.json.tmp app.json
       
+      - name: Validate iOS Submission Credentials
+        if: env.PROFILE == 'production'
+        run: |
+          if [ -z "${{ secrets.APPLE_ID }}" ] || [ -z "${{ secrets.ASC_APP_ID }}" ] || [ -z "${{ secrets.APPLE_TEAM_ID }}" ]; then
+            echo "::error::Missing iOS submission credentials. Please ensure APPLE_ID, ASC_APP_ID, and APPLE_TEAM_ID secrets are set."
+            exit 1
+          fi
+          echo "iOS submission credentials validated"
+      
+      - name: Validate Android Submission Credentials
+        if: env.PROFILE == 'production'
+        run: |
+          # Create service account key file from secret
+          if [ -z "${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}" ]; then
+            echo "::error::Missing Google Service Account Key. Please ensure GOOGLE_SERVICE_ACCOUNT_KEY secret is set."
+            exit 1
+          fi
+          echo "${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}" > google-service-account.json
+          echo "GOOGLE_SERVICE_ACCOUNT_KEY_PATH=$(pwd)/google-service-account.json" >> $GITHUB_ENV
+          echo "Android submission credentials validated"
+      
       - name: Build Production App
-        if: github.event.inputs.environment == 'production' || startsWith(github.ref, 'refs/tags/')
-        run: npx eas-cli build --platform all --profile production --auto-submit --non-interactive
+        if: env.PROFILE == 'production'
+        run: npx eas-cli build --platform all --profile production --non-interactive
+      
+      - name: Submit Production App
+        if: env.PROFILE == 'production'
+        run: |
+          npx eas-cli submit --platform ios --profile production --non-interactive --path latest
+          npx eas-cli submit --platform android --profile production --non-interactive --path latest
+        env:
+          EXPO_APPLE_ID: ${{ secrets.APPLE_ID }}
+          EXPO_ASC_APP_ID: ${{ secrets.ASC_APP_ID }}
+          EXPO_APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          EXPO_ANDROID_KEY_PATH: ${{ env.GOOGLE_SERVICE_ACCOUNT_KEY_PATH }}
       
       - name: Build Staging App
-        if: github.event.inputs.environment == 'staging' && !startsWith(github.ref, 'refs/tags/')
+        if: env.PROFILE == 'preview'
         run: npx eas-cli build --platform all --profile preview --non-interactive
       
       - name: Create GitHub Release
@@ -98,4 +142,11 @@ jobs:
           fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
           text: ":x: Failed to deploy VividWealth app to ${{ github.event.inputs.environment || 'production' }}!"
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          
+      - name: Cleanup Credentials
+        if: always()
+        run: |
+          if [ -f "$(pwd)/google-service-account.json" ]; then
+            rm -f "$(pwd)/google-service-account.json"
+          fi 
