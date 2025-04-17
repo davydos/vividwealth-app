@@ -3,6 +3,7 @@ import { View, Text, ActivityIndicator, ViewStyle } from 'react-native';
 import LottieView from 'lottie-react-native';
 import { styled } from 'nativewind';
 import { COLORS } from '../constants';
+import loadingAnimation from '../assets/animations/loading.json';
 
 interface LoaderProps {
   type?: 'default' | 'fullscreen' | 'inline' | 'skeleton';
@@ -21,8 +22,7 @@ export const Loader = ({
   color = COLORS.ACCENT,
 }: LoaderProps) => {
   // This would need to be replaced with an actual Lottie animation file
-  const loadingAnimation = require('../assets/animations/loading.json');
-
+  
   const getContainerClass = (): string => {
     switch (type) {
       case 'fullscreen':
