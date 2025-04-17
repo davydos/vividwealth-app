@@ -1,6 +1,6 @@
 # CD workflow for VividWealth app
 # Runs on push to main branch and tag releases
-# Required secrets: EXPO_TOKEN, SLACK_WEBHOOK_URL
+# Required secrets: EXPO_TOKEN, SLACK_WEBHOOK_URL, SENTRY_AUTH_TOKEN, SENTRY_ORG, SENTRY_PROJECT
 
 name: VividWealth CD
 
@@ -36,6 +36,9 @@ jobs:
           expo-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
       
+      - name: Install Sentry CLI
+        run: npm install -g @sentry/cli
+      
       - name: Determine environment
         id: determine-env
         run: |
@@ -47,10 +50,54 @@ jobs:
             echo "PROFILE=preview" >> $GITHUB_ENV
           fi
       
+      - name: Set environment variables
+        run: |
+          if [[ "${{ env.PROFILE }}" == "production" ]]; then
+            echo "SENTRY_ENVIRONMENT=production" >> $GITHUB_ENV
+          else
+            echo "SENTRY_ENVIRONMENT=staging" >> $GITHUB_ENV
+          fi
+      
+      - name: Validate Sentry credentials
+        run: |
+          if [ -z "${{ secrets.SENTRY_AUTH_TOKEN }}" ] || [ -z "${{ secrets.SENTRY_ORG }}" ] || [ -z "${{ secrets.SENTRY_PROJECT }}" ]; then
+            echo "::warning::Missing or incomplete Sentry credentials. Source maps upload may fail."
+          else
+            echo "Sentry credentials validated"
+          fi
+      
       - name: Build & Submit
         run: |
           npx eas-cli build --platform all --profile ${{ env.PROFILE }} --non-interactive
           npx eas-cli submit --platform all --profile ${{ env.PROFILE }} --non-interactive
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+      
+      - name: Manual Sentry Source Maps Upload (fallback)
+        if: success() && env.PROFILE == 'production'
+        run: |
+          if [ -n "${{ secrets.SENTRY_AUTH_TOKEN }}" ] && [ -n "${{ secrets.SENTRY_ORG }}" ] && [ -n "${{ secrets.SENTRY_PROJECT }}" ]; then
+            echo "Uploading source maps to Sentry (fallback method)"
+            VERSION=$(node -p "require('./app.json').expo.version")
+            
+            # Upload source maps if the post-publish hook failed
+            sentry-cli releases new "$VERSION"
+            sentry-cli releases set-commits --auto "$VERSION"
+            
+            # Find and upload source maps in the .expo directory
+            find .expo -name "*.map" -type f -exec sentry-cli releases files "$VERSION" upload-sourcemaps --dist "$VERSION" {} \;
+            
+            sentry-cli releases finalize "$VERSION"
+            echo "Source maps uploaded to Sentry"
+          else
+            echo "::warning::Skipping manual source maps upload due to missing Sentry credentials"
+          fi
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
       
       - name: Create Release (for tags only)
         if: startsWith(github.ref, 'refs/tags/v')

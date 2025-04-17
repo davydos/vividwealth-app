@@ -1,6 +1,6 @@
 # Rollback workflow for VividWealth app
 # Triggered manually to roll back to a previous version
-# Required secrets: EXPO_TOKEN, SLACK_WEBHOOK_URL
+# Required secrets: EXPO_TOKEN, SLACK_WEBHOOK_URL, SENTRY_AUTH_TOKEN, SENTRY_ORG, SENTRY_PROJECT
 
 name: VividWealth Rollback
 
@@ -67,9 +67,56 @@ jobs:
         with:
           expo-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
+          
+      - name: Install Sentry CLI
+        run: npm install -g @sentry/cli
+      
+      - name: Set Environment Variables
+        run: |
+          echo "APP_ENV=production" >> $GITHUB_ENV
+          echo "PROFILE=production" >> $GITHUB_ENV
+          echo "SENTRY_ENVIRONMENT=production" >> $GITHUB_ENV
+          echo "Using production environment for rollback"
+      
+      - name: Validate Sentry credentials
+        run: |
+          if [ -z "${{ secrets.SENTRY_AUTH_TOKEN }}" ] || [ -z "${{ secrets.SENTRY_ORG }}" ] || [ -z "${{ secrets.SENTRY_PROJECT }}" ]; then
+            echo "::warning::Missing or incomplete Sentry credentials. Source maps upload may fail."
+          else
+            echo "Sentry credentials validated"
+          fi
       
       - name: Build rollback version
         run: npx eas-cli build --platform all --profile production --non-interactive
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+      
+      - name: Manual Sentry Source Maps Upload
+        if: success()
+        run: |
+          if [ -n "${{ secrets.SENTRY_AUTH_TOKEN }}" ] && [ -n "${{ secrets.SENTRY_ORG }}" ] && [ -n "${{ secrets.SENTRY_PROJECT }}" ]; then
+            echo "Uploading source maps to Sentry for rollback version"
+            VERSION=$(node -p "require('./app.json').expo.version")
+            ROLLBACK_VERSION="rollback-$VERSION-${{ github.run_id }}"
+            
+            # Create a new release for the rollback
+            sentry-cli releases new "$ROLLBACK_VERSION"
+            sentry-cli releases set-commits --auto "$ROLLBACK_VERSION"
+            
+            # Find and upload source maps in the .expo directory
+            find .expo -name "*.map" -type f -exec sentry-cli releases files "$ROLLBACK_VERSION" upload-sourcemaps --dist "$VERSION" {} \;
+            
+            sentry-cli releases finalize "$ROLLBACK_VERSION"
+            echo "Source maps uploaded to Sentry for rollback version"
+          else
+            echo "::warning::Skipping source maps upload due to missing Sentry credentials"
+          fi
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
       
       - name: Create rollback release
         uses: softprops/action-gh-release@v1
