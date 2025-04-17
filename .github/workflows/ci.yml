@@ -102,7 +102,9 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
       
       - name: Expo login
-        run: expo login --username ${{ secrets.EXPO_USERNAME }} --password ${{ secrets.EXPO_PASSWORD }}
+        run: |
+          echo "Using Expo CLI to login"
+          npx expo login -u ${{ secrets.EXPO_USERNAME }} -p ${{ secrets.EXPO_PASSWORD }} --non-interactive
       
       - name: Build Preview
         run: npx eas-cli build --profile preview --platform all --non-interactive --no-wait
