@@ -7,26 +7,23 @@
 
 ## Latest CI Run Status
 **Date:** 2025-04-18
-**Run ID:** 14505652814
+**Run ID:** 14522308411
 **Workflow:** VividWealth CI
 **Branch:** develop
 **Last Rerun Time:** 2025-04-18
 
 **Job Status:**
-- ✅ lint-and-test: Passed (33s)
-- ✅ security-scan: Passed (1m5s)
-- ❌ build-test: Failed (1m29s)
+- ✅ lint-and-test: Passed (45s)
+- ✅ security-scan: Passed (1m13s)
+- ❌ build-test: Failed (1m52s)
 
 **Error Details:**
-- EAS login failing with: "account:login command failed"
-- EXPO_TOKEN authentication functioning correctly during initial setup: "smrteth (authenticated using EXPO_TOKEN)"
-- The initial expo-github-action@v8 authentication step works correctly
-- Error occurs during the separate EAS CLI login step with: `npx eas-cli login --non-interactive`
-- Issue is that EXPO_TOKEN is set in the environment, which prevents username/password authentication
+- EAS login functioning correctly during initial setup: "smrteth (authenticated using EXPO_TOKEN)"
+- ✅ EAS project properly initialized: "Project already initialized"
+- Android credentials import step error: "credentials:import is not an expo command"
+- ❌ Still failing with: "Generating a new Keystore is not supported in --non-interactive mode"
 - Cache restoration failing with 422 errors: "Failed to restore: Cache service responded with 422"
 - Failed to save cache: "This legacy service is shutting down, effective April 15, 2025"
-- ❌ Android credentials import failing with: "Generating a new Keystore is not supported in --non‑interactive mode"
-- ✅ Fixed Android credentials import by changing command to `npx eas-cli credentials:upload`
 
 **Step Status:**
 1. **lint-and-test:**
@@ -41,13 +38,12 @@
    
 3. **build-test:**
    - ✅ Checkout, Setup Node.js, Install Dependencies: Passed
-   - ✅ Setup Expo: Passed with authentication success
+   - ✅ Setup Expo: Passed with authentication success "smrteth (authenticated using EXPO_TOKEN)"
    - ✅ Set Environment Variables: Passed
    - ✅ Install EAS CLI: Passed
-   - ❌ EAS login: Failed with error because EXPO_TOKEN was already set
-   - ⏹️ Initialize EAS project: Not reached (previous step failed)
-   - ❌ Android credentials import: Failed with "Generating a new Keystore is not supported" (fixed by using credentials:upload)
-   - ⏹️ Build Preview: Not reached (previous step failed)
+   - ✅ Initialize EAS project: Passed with "Project already initialized"
+   - ❌ Import Android Credentials: Failed with "credentials:import is not an expo command"
+   - ❌ Build Preview: Failed with "Generating a new Keystore is not supported in --non-interactive mode"
 
 **Improvements Since Last Run:**
 - ✅ Added EAS project initialization step that:
@@ -55,15 +51,15 @@
   - Sets EAS_PROJECT_ID environment variable
   - Initializes the EAS project with eas project:init command
 - ✅ Improved error handling for EAS project initialization
-- ✅ Fixed Android credentials import step by using appropriate command for CI environment
+- ❌ Android credentials import step still failing but different error: "credentials:import is not an expo command"
 
 **Fix Status:**
 - ✅ CodeQL v3 Update: Working (upgraded from v2)
 - ✅ Permissions Fix: Working (security-events: write permission active)
-- ✅ EAS Project Init: Added to CI workflow (but not reached due to login failure)
-- ❌ EAS Login Command: Not working (syntax error with arguments)
+- ✅ EAS Project Init: Working (shows "Project already initialized")
+- ❌ EAS Login Command: Working (authentication successful)
 - ✅ Slack Notification: Removed from workflow (2025-04-17)
-- ✅ Android Credentials Import: Fixed by using credentials:upload instead of credentials:manager
+- ❌ Android Credentials Import: Still failing (need to update command format)
 
 **Recent Code Changes:**
 - Commit `d225ed7`: "fix: move hooks to top level in eas.json to satisfy schema" (2025-04-17)
@@ -84,7 +80,7 @@
 3. Fix unused imports and variables
 4. Create the vividwealth organization and repository
 5. Push branches to the organization repository
-6. Fix Android credentials import step
+6. Fix Android credentials import step by replacing "expo credentials:import" with "npx eas-cli credentials"
 
 ## Organization Repository Status
 **Date:** 2025-04-17
@@ -134,7 +130,8 @@
 13. ❌ Migrate to organization repository (pending organization creation)
 14. ✅ Removed Slack notification from CI workflow (commit: [date: 2025-04-17])
 15. ✅ Added Android keystore secrets to repository (2025-04-18)
-16. ✅ Fixed Android credentials import step in CI workflow (2025-04-18)
+16. ✅ Attempted Android credentials import fix but command format needs further updates (2025-04-18)
+17. ✅ Triggered CI workflow run to verify Android credentials import (2025-04-18)
 
 ## Repository Secrets Audit
 **Date:** 2025-04-18
@@ -207,7 +204,8 @@
 - Committed leftover changes on feature/goal-assessment branch (2025-04-18)
 - Merged PR #5 "feat: video generation pipeline with mock client" into develop branch (2025-04-18)
 - ✅ Added Android keystore import step to CI workflow (2025-04-18)
-- ✅ Fixed Android credentials import step by changing to credentials:upload command (2025-04-18)
+- ✅ Attempted Android credentials import fix but command format needs further updates (2025-04-18)
+- ✅ Triggered CI workflow run to verify Android credentials import (2025-04-18)
 
 ## Blockers
 - Need organization "vividwealth" to be created (temporarily using personal account)
@@ -216,9 +214,9 @@
 - All required secrets are missing from the organization repository (pending repository creation)
 - ~Expo authentication failing with 401 error~ (Fixed with pull_request_target update - verified working)
 - ~EAS configuration validation error: "hooks" property in eas.json is not allowed~ (Fixed by removing hooks property)
-- ❌ EAS login command failing with syntax error (unexpected arguments)
-- ❌ EAS project not initialized in CI environment due to login failure
-- ❌ Android build failing with credential issues (fixed Android credentials import step in CI workflow)
+- ✅ EAS login command functioning correctly (authentication successful)
+- ✅ EAS project initialization working correctly
+- ❌ Android credentials import still failing (need to update command syntax to use eas-cli directly)
 
 ## Recommendations
 1. Create GitHub organization "vividwealth" and transfer the repository
@@ -242,8 +240,7 @@
 - ~EAS.json configuration has invalid "hooks" property causing build failures~ (Fixed by removing hooks property)
 - ~EAS login command has incorrect syntax in CI workflow~ (Fixed by removing redundant login step - 2025-04-18)
 - ~GitHub Actions cache service warning about impending shutdown~ (Fixed by upgrading to actions/cache@v4 - 2025-04-18)
-- ~Android credentials import failing in CI environment~ (Fixed by updating import command - 2025-04-18)
-- ❌ EAS project not initialized in CI environment due to login failure
+- ❌ Android credentials import still failing - need to update command from "expo credentials:import" to "npx eas-cli credentials"
 - Type declaration dependencies are missing for React, React Native, NativeWind, and React Native Reanimated (tracked in issue #1)
 - Legacy Expo CLI warnings about Node +17 support (should be migrated to newer Expo CLI)
 
@@ -381,8 +378,7 @@ The "vividwealth" organization and the "vividwealth-app" repository do not exist
 - ~EAS.json configuration has invalid "hooks" property causing build failures~ (Fixed by removing hooks property)
 - ~EAS login command has incorrect syntax in CI workflow~ (Fixed by removing redundant login step - 2025-04-18)
 - ~GitHub Actions cache service warning about impending shutdown~ (Fixed by upgrading to actions/cache@v4 - 2025-04-18)
-- ~Android credentials import failing in CI environment~ (Fixed by updating import command - 2025-04-18)
-- ❌ EAS project not initialized in CI environment due to login failure
+- ❌ Android credentials import still failing - need to update command from "expo credentials:import" to "npx eas-cli credentials"
 - Type declaration dependencies are missing for React, React Native, NativeWind, and React Native Reanimated (tracked in issue #1)
 - Legacy Expo CLI warnings about Node +17 support (should be migrated to newer Expo CLI)
 
