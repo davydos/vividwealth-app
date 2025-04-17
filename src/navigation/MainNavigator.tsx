@@ -7,6 +7,7 @@ import { styled } from 'nativewind';
 
 // Import DashboardScreen
 import DashboardScreen from '../screens/DashboardScreen';
+import SubscriptionScreen from '../screens/SubscriptionScreen';
 
 // Temporarily create placeholder screens
 const StudioScreen = () => null;
@@ -16,6 +17,7 @@ const SettingsScreen = () => null;
 export type MainTabParamList = {
   Dashboard: undefined;
   Studio: undefined;
+  Subscription: undefined;
   Profile: undefined;
   Settings: undefined;
 };
@@ -66,6 +68,17 @@ export const MainNavigator = () => {
           tabBarIcon: ({ color, focused }) => (
             <StyledView className={`items-center justify-center rounded-full p-1 ${focused ? 'bg-accent/20' : ''}`}>
               <StyledText className="text-xl">🎬</StyledText>
+            </StyledView>
+          ),
+        }}
+      />
+      <Tab.Screen 
+        name="Subscription" 
+        component={SubscriptionScreen}
+        options={{
+          tabBarIcon: ({ color, focused }) => (
+            <StyledView className={`items-center justify-center rounded-full p-1 ${focused ? 'bg-accent/20' : ''}`}>
+              <StyledText className="text-xl">✨</StyledText>
             </StyledView>
           ),
         }}
