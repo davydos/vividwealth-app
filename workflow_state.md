@@ -95,9 +95,10 @@
 6. ✅ Created issue for fixing type declarations
 7. ✅ Added EXPO_USERNAME and EXPO_PASSWORD secrets and updated CI workflow (commit: [date: 2025-04-17])
 8. ✅ Added remote for organization repository (org-origin)
-9. ❌ Migrate to organization repository (pending organization creation)
-10. ❌ Fix Expo authentication issues (incorrect format or invalid credentials)
-11. ✅ Removed Slack notification from CI workflow (commit: [date: 2025-04-17])
+9. ✅ Committed leftover changes on feature/goal-assessment branch (commit: [date: 2025-04-18])
+10. ❌ Migrate to organization repository (pending organization creation)
+11. ❌ Fix Expo authentication issues (incorrect format or invalid credentials)
+12. ✅ Removed Slack notification from CI workflow (commit: [date: 2025-04-17])
 
 ## Repository Secrets Audit
 **Date:** 2025-04-17
@@ -154,6 +155,8 @@
 - Added all required GitHub secrets but issue with Expo credentials persists
 - Removed Slack notification step from CI workflow to simplify debugging
 - Reran the CI workflow after removing Slack notifications (401 error persists)
+- Created and merged PR for goal assessment screen and timeframe utility
+- Committed leftover changes on feature/goal-assessment branch (2025-04-18)
 
 ## Blockers
 - Need organization "vividwealth" to be created (temporarily using personal account)
