@@ -2,33 +2,29 @@
 
 ## Project Status
 **Current Version:** 0.1.0
-**Last Updated:** 2025-04-17
+**Last Updated:** 2025-04-18
 **Status:** GitHub Setup Complete
 
 ## Latest CI Run Status
 **Date:** 2025-04-18
-**Run ID:** 14520601744
+**Run ID:** 14505652814
 **Workflow:** VividWealth CI
 **Branch:** develop
 **Last Rerun Time:** 2025-04-18
-**Latest Change:** Added EAS project initialization step
 
 **Job Status:**
-- ✅ lint-and-test: Passed (50s)
-- ✅ security-scan: Passed (1m6s)
+- ✅ lint-and-test: Passed (33s)
+- ✅ security-scan: Passed (1m5s)
 - ❌ build-test: Failed (1m29s)
 
-**Workflow Trigger Updates:**
-- ✅ Changed workflow trigger from `pull_request` to `pull_request_target` to ensure secrets are accessible for external PRs
-- ✅ Modified conditional checks in security-scan and build-test jobs to include pull_request_target
-- ✅ Expo authentication now running properly with full access to repository secrets
-- ✅ Confirmed authentication working: "smrteth (authenticated using EXPO_TOKEN)"
-
 **Error Details:**
-- EAS login failing with: "Unexpected arguments: --token, ***, --non-interactive"
-- Error message: "account:login command failed"
-- This is a new error in the syntax of the EAS login command
-- Cache restoration still failing with 422 errors (not resolved)
+- EAS login failing with: "account:login command failed"
+- EXPO_TOKEN authentication functioning correctly during initial setup: "smrteth (authenticated using EXPO_TOKEN)"
+- The initial expo-github-action@v8 authentication step works correctly
+- Error occurs during the separate EAS CLI login step with: `npx eas-cli login --non-interactive`
+- Issue is that EXPO_TOKEN is set in the environment, which prevents username/password authentication
+- Cache restoration failing with 422 errors: "Failed to restore: Cache service responded with 422"
+- Failed to save cache: "This legacy service is shutting down, effective April 15, 2025"
 
 **Step Status:**
 1. **lint-and-test:**
@@ -40,14 +36,13 @@
    - ✅ Checkout, Setup Node.js: Passed
    - ✅ Run npm audit: Passed
    - ✅ CodeQL Analysis: Passed (with warnings about deprecated versions)
-   - Note: CodeQL v3 is working properly now
    
 3. **build-test:**
    - ✅ Checkout, Setup Node.js, Install Dependencies: Passed
-   - ✅ Setup Expo: Passed
+   - ✅ Setup Expo: Passed with authentication success
    - ✅ Set Environment Variables: Passed
    - ✅ Install EAS CLI: Passed
-   - ❌ EAS login: Failed with error "Unexpected arguments: --token, ***"
+   - ❌ EAS login: Failed with error because EXPO_TOKEN was already set
    - ⏹️ Initialize EAS project: Not reached (previous step failed)
    - ⏹️ Build Preview: Not reached (previous step failed)
 
@@ -159,13 +154,17 @@
    - ✅ Set up branch protection rules
    - ✅ Add repository secrets
    - Create GitHub Project board (instructions provided)
-2. Fix type declaration issues (Issue #1)
-3. Validate CI/CD workflows are running correctly with pull_request_target changes 
-4. Create first feature branch for development
-5. Implement user feedback system
-6. Begin beta testing preparation
+2. ✅ CI workflow updated: Removed redundant EAS login step
+3. ✅ CI workflow updated: Upgraded actions/cache from v3 to v4 to address deprecation warning
+4. Fix type declaration issues (Issue #1)
+5. Validate CI/CD workflows are running correctly with pull_request_target changes 
+6. Create first feature branch for development
+7. Implement user feedback system
+8. Begin beta testing preparation
 
 ## Recent Activity
+- ✅ Updated CI workflow: Removed redundant EAS login step that was causing errors (2025-04-18)
+- ✅ Updated CI workflow: Upgraded actions/cache from v3 to v4 to address cache service deprecation warning (2025-04-18)
 - Added repository secrets: EXPO_TOKEN, SLACK_WEBHOOK_URL, CODECOV_TOKEN, and GITHUB_TOKEN
 - Set up branch protection rules for main and develop branches requiring:
   - Pull request reviews before merging
@@ -206,19 +205,22 @@
 3. Fix Expo authentication issues:
    - ✅ Updated workflow to use pull_request_target to ensure secrets are accessible for external PRs
    - ✅ Verified EXPO_TOKEN is working correctly with successful authentication
-   - ❌ Fix EAS login command syntax in the CI workflow
+   - ✅ Fixed EAS login by removing redundant login step (2025-04-18)
 4. Fix EAS configuration:
    - ✅ Fixed eas.json file by removing the "hooks" property to satisfy schema validation
    - ✅ Added 'eas project:init' step to CI workflow to initialize the EAS project properly
-   - ❌ Update EAS login command with correct syntax
-5. Remove SLACK_WEBHOOK_URL secret as it's no longer needed
-6. Complete setup of GitHub Project board for task tracking
-7. Implement required type declarations for React, React Native, and other libraries to fix linter errors
+   - ✅ Removed redundant EAS login command that was causing errors (2025-04-18)
+5. Address GitHub Actions deprecation warnings:
+   - ✅ Upgraded actions/cache from v3 to v4 to use the new caching service (2025-04-18)
+6. Remove SLACK_WEBHOOK_URL secret as it's no longer needed
+7. Complete setup of GitHub Project board for task tracking
+8. Implement required type declarations for React, React Native, and other libraries to fix linter errors
 
 ## Known Issues
 - ~Expo authentication failing with 401 error~ (Fixed with pull_request_target update - verified working)
 - ~EAS.json configuration has invalid "hooks" property causing build failures~ (Fixed by removing hooks property)
-- ❌ EAS login command has incorrect syntax in CI workflow
+- ~EAS login command has incorrect syntax in CI workflow~ (Fixed by removing redundant login step - 2025-04-18)
+- ~GitHub Actions cache service warning about impending shutdown~ (Fixed by upgrading to actions/cache@v4 - 2025-04-18)
 - ❌ EAS project not initialized in CI environment due to login failure
 - Type declaration dependencies are missing for React, React Native, NativeWind, and React Native Reanimated (tracked in issue #1)
 - Legacy Expo CLI warnings about Node +17 support (should be migrated to newer Expo CLI)
@@ -355,7 +357,8 @@ The "vividwealth" organization and the "vividwealth-app" repository do not exist
 ## Known Issues
 - ~Expo authentication failing with 401 error~ (Fixed with pull_request_target update - verified working)
 - ~EAS.json configuration has invalid "hooks" property causing build failures~ (Fixed by removing hooks property)
-- ❌ EAS login command has incorrect syntax in CI workflow
+- ~EAS login command has incorrect syntax in CI workflow~ (Fixed by removing redundant login step - 2025-04-18)
+- ~GitHub Actions cache service warning about impending shutdown~ (Fixed by upgrading to actions/cache@v4 - 2025-04-18)
 - ❌ EAS project not initialized in CI environment due to login failure
 - Type declaration dependencies are missing for React, React Native, NativeWind, and React Native Reanimated (tracked in issue #1)
 - Legacy Expo CLI warnings about Node +17 support (should be migrated to newer Expo CLI)
