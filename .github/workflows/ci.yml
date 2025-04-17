@@ -105,6 +105,12 @@ jobs:
         run: |
           echo "Using Expo CLI to login"
           npx expo login -u ${{ secrets.EXPO_USERNAME }} -p ${{ secrets.EXPO_PASSWORD }} --non-interactive
+          
+      - name: Set Environment Variables
+        run: |
+          echo "APP_ENV=staging" >> $GITHUB_ENV
+          echo "PROFILE=preview" >> $GITHUB_ENV
+          echo "Using staging environment for test build"
       
       - name: Build Preview
         run: npx eas-cli build --profile preview --platform all --non-interactive --no-wait
