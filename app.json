@@ -33,7 +33,8 @@
     "extra": {
       "eas": {
         "projectId": "a7224124-6885-4d37-bd08-bb9ac969cf17"
-      }
+      },
+      "VIDEO_API_URL": "https://your-production-endpoint.com/generate-video"
     },
     "owner": "smrteth",
     "runtimeVersion": {
