@@ -34,7 +34,14 @@
         "APP_ENV": "staging"
       },
       "channel": "staging",
-      "autoIncrement": true
+      "autoIncrement": true,
+      "hooks": {
+        "postPublish": [
+          {
+            "file": "sentry-expo/upload-sourcemaps"
+          }
+        ]
+      }
     },
     "production": {
       "ios": {
@@ -48,7 +55,14 @@
         "APP_ENV": "production"
       },
       "channel": "production",
-      "autoIncrement": true
+      "autoIncrement": true,
+      "hooks": {
+        "postPublish": [
+          {
+            "file": "sentry-expo/upload-sourcemaps"
+          }
+        ]
+      }
     }
   },
   "submit": {
@@ -63,12 +77,5 @@
         "track": "production"
       }
     }
-  },
-  "hooks": {
-    "postPublish": [
-      {
-        "file": "sentry-expo/upload-sourcemaps"
-      }
-    ]
   }
 } 
