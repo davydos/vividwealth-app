@@ -5,11 +5,10 @@ import { COLORS } from '../constants';
 import { View, Text } from 'react-native';
 import { styled } from 'nativewind';
 
-// Import screens here when created
-// import { DashboardScreen, StudioScreen, ProfileScreen, SettingsScreen } from '../screens';
+// Import DashboardScreen
+import DashboardScreen from '../screens/DashboardScreen';
 
 // Temporarily create placeholder screens
-const DashboardScreen = () => null;
 const StudioScreen = () => null;
 const ProfileScreen = () => null;
 const SettingsScreen = () => null;
