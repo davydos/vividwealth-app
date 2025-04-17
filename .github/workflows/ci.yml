@@ -1,6 +1,6 @@
 # CI workflow for VividWealth app
 # Runs on push/PR to main and develop branches
-# Required secrets: CODECOV_TOKEN, SLACK_WEBHOOK_URL, EXPO_TOKEN, EXPO_USERNAME, EXPO_PASSWORD
+# Required secrets: CODECOV_TOKEN, EXPO_TOKEN, EXPO_USERNAME, EXPO_PASSWORD
 
 name: VividWealth CI
 
@@ -125,14 +125,4 @@ jobs:
                 title: 'Expo Build Test',
                 summary: 'The build test was successful'
               }
-            })
-      
-      - name: Notify on Failure
-        if: failure()
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+            }) 
