@@ -63,12 +63,5 @@
         "track": "production"
       }
     }
-  },
-  "hooks": {
-    "postPublish": [
-      {
-        "file": "sentry-expo/upload-sourcemaps"
-      }
-    ]
   }
 } 
