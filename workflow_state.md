@@ -127,19 +127,27 @@
 14. ✅ Removed Slack notification from CI workflow (commit: [date: 2025-04-17])
 
 ## Repository Secrets Audit
-**Date:** 2025-04-17
+**Date:** 2025-04-18
 
 **Required Secrets (from CI workflow):**
 1. CODECOV_TOKEN - For uploading test coverage
 2. EXPO_TOKEN - For Expo CLI authentication
 3. EXPO_USERNAME - For Expo login
 4. EXPO_PASSWORD - For Expo login
+5. ANDROID_KEYSTORE_BASE64 - Base64-encoded Android keystore file
+6. ANDROID_KEY_ALIAS - Alias for the Android keystore
+7. ANDROID_KEYSTORE_PASSWORD - Password for the Android keystore
+8. ANDROID_KEY_PASSWORD - Password for the Android key
 
 **Current Repository Secrets (davydos/vividwealth-app):**
 - ✅ CODECOV_TOKEN
 - ❌ EXPO_TOKEN (present but invalid or incorrectly formatted)
 - ❌ EXPO_USERNAME (present but may be invalid)
 - ❌ EXPO_PASSWORD (present but may be invalid)
+- ✅ ANDROID_KEYSTORE_BASE64 (added on 2025-04-18)
+- ✅ ANDROID_KEY_ALIAS (added on 2025-04-18)
+- ✅ ANDROID_KEYSTORE_PASSWORD (added on 2025-04-18)
+- ✅ ANDROID_KEY_PASSWORD (added on 2025-04-18)
 - ⚠️ SLACK_WEBHOOK_URL (no longer required, can be removed)
 
 **Organization Repository Secrets (vividwealth/vividwealth-app):**
