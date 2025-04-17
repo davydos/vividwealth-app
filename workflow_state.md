@@ -7,16 +7,16 @@
 
 ## Latest CI Run Status
 **Date:** 2025-04-17
-**Run ID:** 14516312994
+**Run ID:** 14520429053
 **Workflow:** VividWealth CI
 **Branch:** develop
 **Last Rerun Time:** 2025-04-17
-**Latest Change:** Updated workflow to use pull_request_target instead of pull_request
+**Latest Change:** Fixed eas.json schema by removing hooks property
 
 **Job Status:**
-- ✅ lint-and-test: Passed (50s)
-- ✅ security-scan: Passed (1m5s)
-- ❌ build-test: Failed (1m36s)
+- ✅ lint-and-test: Passed (48s)
+- ✅ security-scan: Passed (1m8s)
+- ❌ build-test: Failed (1m34s)
 
 **Workflow Trigger Updates:**
 - ✅ Changed workflow trigger from `pull_request` to `pull_request_target` to ensure secrets are accessible for external PRs
@@ -25,10 +25,10 @@
 - ✅ Confirmed authentication working: "smrteth (authenticated using EXPO_TOKEN)"
 
 **Error Details:**
-- ❌ The build-test job is now failing with "eas.json is not valid. - 'hooks' is not allowed"
-- This is a schema validation error in the EAS configuration
-- The issue is unrelated to the authentication setup which is now working correctly
-- The Expo token is valid and authenticating successfully
+- ❌ The build-test job is now failing with "EAS project not configured"
+- Error message: "Must configure EAS project by running 'eas init' before this command can be run in non-interactive mode"
+- This is different from the previous validation error, indicating progress
+- The eas.json schema validation error has been fixed by removing the hooks property
 
 **Step Status:**
 1. **lint-and-test:**
@@ -51,10 +51,13 @@
    - ✅ Install Expo CLI: Completed
    - ✅ Setup Expo: Completed successfully with token authentication
    - ✅ Set Environment Variables: Completed
-   - ❌ Build Preview: Failed with "eas.json is not valid. - 'hooks' is not allowed"
+   - ❌ Build Preview: Failed with "EAS project not configured"
    - ⏹️ Create Status Check: Not reached
 
 **Improvements Since Last Run:**
+- ✅ Fixed eas.json schema validation error by removing the hooks property
+- ✅ No more 'hooks is not allowed' errors in the EAS validation
+- ✅ The workflow now progresses further in the build process
 - ✅ Fixed linting issues: Converted `require()` to ES6 import in Loader.tsx
 - ✅ Fixed escaped apostrophe in ErrorBoundary.tsx by replacing `We're` with `We&apos;re`
 - ✅ Fixed cache configuration in CI workflow:
@@ -74,9 +77,10 @@
 - ✅ Required() style imports: Converted to standard ES6 imports in Loader.tsx
 - ✅ Backtick/apostrophe escaping: Fixed in ErrorBoundary.tsx
 - ✅ Setup-node cache parameters: Removed invalid parameters
-- ❌ EAS configuration: Need to fix eas.json "hooks" property validation error
+- ✅ EAS configuration: Fixed eas.json "hooks" property validation error
 
 **Recent Code Changes:**
+- Commit `d225ed7`: "fix: move hooks to top level in eas.json to satisfy schema" (2025-04-17)
 - Commit `97c8443`: "ci: remove invalid cache options from setup-node" (2025-04-17)
 - Commit `fd9f4af`: "fix: escape backticks and remove unused imports in ErrorBoundary" (2025-04-17) 
 - Commit `a96e5b6`: "fix: convert require() to import in Loader.tsx" (2025-04-17)
@@ -87,7 +91,7 @@
 - Commit `e9d3215`: "ci: use pull_request_target and conditional for Expo setup" (2025-04-17)
 
 **Next Steps:**
-1. Fix the eas.json file to remove or update the "hooks" property to match the expected schema
+1. Configure EAS project by running 'eas init' in the CI workflow
 2. Address remaining TypeScript "any" types in the codebase
 3. Fix unused imports and variables
 4. Create the vividwealth organization and repository
@@ -206,7 +210,8 @@
 - Repository secrets need to be configured manually via GitHub web interface (Completed for davydos/vividwealth-app)
 - All required secrets are missing from the organization repository (pending repository creation)
 - ~Expo authentication failing with 401 error~ (Fixed with pull_request_target update - verified working)
-- ❌ EAS configuration validation error: "hooks" property in eas.json is not allowed
+- ~EAS configuration validation error: "hooks" property in eas.json is not allowed~ (Fixed by removing hooks property)
+- ❌ EAS project not initialized in CI environment, need to run 'eas init' in workflow
 
 ## Recommendations
 1. Create GitHub organization "vividwealth" and transfer the repository
@@ -214,16 +219,17 @@
 3. Fix Expo authentication issues:
    - ✅ Updated workflow to use pull_request_target to ensure secrets are accessible for external PRs
    - ✅ Verified EXPO_TOKEN is working correctly with successful authentication
-4. Fix EAS configuration validation:
-   - Update eas.json file to remove or properly format the "hooks" property
-   - Validate eas.json against the EAS schema
+4. Fix EAS configuration:
+   - ✅ Fixed eas.json file by removing the "hooks" property to satisfy schema validation
+   - ❌ Add 'eas init' step to CI workflow to initialize the EAS project properly
 5. Remove SLACK_WEBHOOK_URL secret as it's no longer needed
 6. Complete setup of GitHub Project board for task tracking
 7. Implement required type declarations for React, React Native, and other libraries to fix linter errors
 
 ## Known Issues
 - ~Expo authentication failing with 401 error~ (Fixed with pull_request_target update - verified working)
-- ❌ EAS.json configuration has invalid "hooks" property causing build failures
+- ~EAS.json configuration has invalid "hooks" property causing build failures~ (Fixed by removing hooks property)
+- ❌ EAS project not initialized in CI environment - must run 'eas init' in workflow
 - Type declaration dependencies are missing for React, React Native, NativeWind, and React Native Reanimated (tracked in issue #1)
 - Legacy Expo CLI warnings about Node +17 support (should be migrated to newer Expo CLI)
 
@@ -260,7 +266,7 @@ The `eas.json` file defines several build profiles:
    - Android: Requires service account key and production track
 
 5. **Hooks:**
-   - Post-publish hook configured for Sentry source maps upload
+   - ~Post-publish hook configured for Sentry source maps upload~ (Removed from build profiles to satisfy schema validation)
 
 ## Organization Repository Status
 The "vividwealth" organization and the "vividwealth-app" repository do not exist yet. The repository has been created under davydos/vividwealth-app and used for CI testing.
@@ -305,7 +311,7 @@ The "vividwealth" organization and the "vividwealth-app" repository do not exist
 
 ## Latest CI Run Status
 - **Date:** April 17, 2025
-- **Run ID:** 14516312994
+- **Run ID:** 14520429053
 - **Job Statuses:**
   - lint-and-test: ✅ SUCCESS (completed in 39 seconds)
   - security-scan: ✅ SUCCESS
@@ -358,7 +364,8 @@ The "vividwealth" organization and the "vividwealth-app" repository do not exist
 
 ## Known Issues
 - ~Expo authentication failing with 401 error~ (Fixed with pull_request_target update - verified working)
-- ❌ EAS.json configuration has invalid "hooks" property causing build failures
+- ~EAS.json configuration has invalid "hooks" property causing build failures~ (Fixed by removing hooks property)
+- ❌ EAS project not initialized in CI environment - must run 'eas init' in workflow
 - Type declaration dependencies are missing for React, React Native, NativeWind, and React Native Reanimated (tracked in issue #1)
 - Legacy Expo CLI warnings about Node +17 support (should be migrated to newer Expo CLI)
 
