@@ -4,8 +4,6 @@ import { View, LogBox } from 'react-native';
 import { styled } from 'nativewind';
 import { RootNavigator } from './src/navigation';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { COLORS } from './src/constants';
-import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { AuthProvider } from './src/contexts';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
@@ -34,14 +32,8 @@ export default function App() {
   useEffect(() => {
     async function prepare() {
       try {
-        // Preload fonts
-        // In a real app, we'd load the Satoshi font
-        // await Font.loadAsync({
-        //   'Satoshi-Regular': require('./src/assets/fonts/Satoshi-Regular.otf'),
-        //   'Satoshi-Medium': require('./src/assets/fonts/Satoshi-Medium.otf'),
-        //   'Satoshi-Bold': require('./src/assets/fonts/Satoshi-Bold.otf'),
-        //   'Satoshi-Black': require('./src/assets/fonts/Satoshi-Black.otf'),
-        // });
+        // Preload fonts would go here if needed
+        // For now, no fonts are being loaded
       } catch (e) {
         console.warn(e);
       } finally {
