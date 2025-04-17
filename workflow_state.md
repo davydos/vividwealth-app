@@ -6,17 +6,17 @@
 **Status:** GitHub Setup Complete
 
 ## Latest CI Run Status
-**Date:** 2025-04-17
-**Run ID:** 14520429053
+**Date:** 2025-04-18
+**Run ID:** 14520601744
 **Workflow:** VividWealth CI
 **Branch:** develop
-**Last Rerun Time:** 2025-04-17
-**Latest Change:** Fixed eas.json schema by removing hooks property
+**Last Rerun Time:** 2025-04-18
+**Latest Change:** Added EAS project initialization step
 
 **Job Status:**
-- ✅ lint-and-test: Passed (48s)
-- ✅ security-scan: Passed (1m8s)
-- ❌ build-test: Failed (1m34s)
+- ✅ lint-and-test: Passed (50s)
+- ✅ security-scan: Passed (1m6s)
+- ❌ build-test: Failed (1m29s)
 
 **Workflow Trigger Updates:**
 - ✅ Changed workflow trigger from `pull_request` to `pull_request_target` to ensure secrets are accessible for external PRs
@@ -25,59 +25,45 @@
 - ✅ Confirmed authentication working: "smrteth (authenticated using EXPO_TOKEN)"
 
 **Error Details:**
-- ❌ The build-test job is now failing with "EAS project not configured"
-- Error message: "Must configure EAS project by running 'eas init' before this command can be run in non-interactive mode"
-- This is different from the previous validation error, indicating progress
-- The eas.json schema validation error has been fixed by removing the hooks property
+- EAS login failing with: "Unexpected arguments: --token, ***, --non-interactive"
+- Error message: "account:login command failed"
+- This is a new error in the syntax of the EAS login command
+- Cache restoration still failing with 422 errors (not resolved)
 
 **Step Status:**
 1. **lint-and-test:**
-   - ✅ Checkout, Setup Node.js: Completed
-   - ✅ Cache node modules: Completed successfully (no 422 errors)
-   - ✅ Install Dependencies: Completed
-   - ✅ Run Linting, Type Checking, Tests: Completed with expected warnings
-   - ✅ Upload Coverage: Completed
+   - ✅ Checkout, Setup Node.js, Install Dependencies: Passed
+   - ✅ Run Linting, Type Checking, Tests: Passed (with expected errors)
+   - ✅ Upload Coverage: Passed
 
 2. **security-scan:**
-   - ✅ Checkout, Setup Node.js: Completed
-   - ✅ Cache node modules: Completed successfully (no 422 errors)
-   - ✅ Run npm audit: Completed
-   - ✅ Initialize and perform CodeQL Analysis: Completed
-
+   - ✅ Checkout, Setup Node.js: Passed
+   - ✅ Run npm audit: Passed
+   - ✅ CodeQL Analysis: Passed (with warnings about deprecated versions)
+   - Note: CodeQL v3 is working properly now
+   
 3. **build-test:**
-   - ✅ Checkout, Setup Node.js: Completed
-   - ✅ Cache node modules: Completed (some 422 errors still present)
-   - ✅ Install Dependencies: Completed
-   - ✅ Install Expo CLI: Completed
-   - ✅ Setup Expo: Completed successfully with token authentication
-   - ✅ Set Environment Variables: Completed
-   - ❌ Build Preview: Failed with "EAS project not configured"
-   - ⏹️ Create Status Check: Not reached
+   - ✅ Checkout, Setup Node.js, Install Dependencies: Passed
+   - ✅ Setup Expo: Passed
+   - ✅ Set Environment Variables: Passed
+   - ✅ Install EAS CLI: Passed
+   - ❌ EAS login: Failed with error "Unexpected arguments: --token, ***"
+   - ⏹️ Initialize EAS project: Not reached (previous step failed)
+   - ⏹️ Build Preview: Not reached (previous step failed)
 
 **Improvements Since Last Run:**
-- ✅ Fixed eas.json schema validation error by removing the hooks property
-- ✅ No more 'hooks is not allowed' errors in the EAS validation
-- ✅ The workflow now progresses further in the build process
-- ✅ Fixed linting issues: Converted `require()` to ES6 import in Loader.tsx
-- ✅ Fixed escaped apostrophe in ErrorBoundary.tsx by replacing `We're` with `We&apos;re`
-- ✅ Fixed cache configuration in CI workflow:
-  - Removed invalid `cache: 'npm'` parameter from setup-node steps
-  - Added proper `restore-keys` for cache fallback
-  - Added descriptive names for cache steps
-- ✅ No more 422 cache errors for lint-and-test and security-scan jobs
-- ✅ Expo authentication working correctly with token
+- ✅ Added EAS project initialization step that:
+  - Dynamically extracts project ID from app.json
+  - Sets EAS_PROJECT_ID environment variable
+  - Initializes the EAS project with eas project:init command
+- ✅ Improved error handling for EAS project initialization
 
 **Fix Status:**
 - ✅ CodeQL v3 Update: Working (upgraded from v2)
 - ✅ Permissions Fix: Working (security-events: write permission active)
-- ✅ Expo Authentication: Fixed with updated EXPO_TOKEN
+- ✅ EAS Project Init: Added to CI workflow (but not reached due to login failure)
+- ❌ EAS Login Command: Not working (syntax error with arguments)
 - ✅ Slack Notification: Removed from workflow (2025-04-17)
-- ✅ Unused imports: Fixed in App.tsx and ErrorBoundary.tsx
-- ✅ Cache key issues: Fixed in CI workflow with versioned keys and explicit caching
-- ✅ Required() style imports: Converted to standard ES6 imports in Loader.tsx
-- ✅ Backtick/apostrophe escaping: Fixed in ErrorBoundary.tsx
-- ✅ Setup-node cache parameters: Removed invalid parameters
-- ✅ EAS configuration: Fixed eas.json "hooks" property validation error
 
 **Recent Code Changes:**
 - Commit `d225ed7`: "fix: move hooks to top level in eas.json to satisfy schema" (2025-04-17)
@@ -211,7 +197,8 @@
 - All required secrets are missing from the organization repository (pending repository creation)
 - ~Expo authentication failing with 401 error~ (Fixed with pull_request_target update - verified working)
 - ~EAS configuration validation error: "hooks" property in eas.json is not allowed~ (Fixed by removing hooks property)
-- ❌ EAS project not initialized in CI environment, need to run 'eas init' in workflow
+- ❌ EAS login command failing with syntax error (unexpected arguments)
+- ❌ EAS project not initialized in CI environment due to login failure
 
 ## Recommendations
 1. Create GitHub organization "vividwealth" and transfer the repository
@@ -219,9 +206,11 @@
 3. Fix Expo authentication issues:
    - ✅ Updated workflow to use pull_request_target to ensure secrets are accessible for external PRs
    - ✅ Verified EXPO_TOKEN is working correctly with successful authentication
+   - ❌ Fix EAS login command syntax in the CI workflow
 4. Fix EAS configuration:
    - ✅ Fixed eas.json file by removing the "hooks" property to satisfy schema validation
-   - ❌ Add 'eas init' step to CI workflow to initialize the EAS project properly
+   - ✅ Added 'eas project:init' step to CI workflow to initialize the EAS project properly
+   - ❌ Update EAS login command with correct syntax
 5. Remove SLACK_WEBHOOK_URL secret as it's no longer needed
 6. Complete setup of GitHub Project board for task tracking
 7. Implement required type declarations for React, React Native, and other libraries to fix linter errors
@@ -229,7 +218,8 @@
 ## Known Issues
 - ~Expo authentication failing with 401 error~ (Fixed with pull_request_target update - verified working)
 - ~EAS.json configuration has invalid "hooks" property causing build failures~ (Fixed by removing hooks property)
-- ❌ EAS project not initialized in CI environment - must run 'eas init' in workflow
+- ❌ EAS login command has incorrect syntax in CI workflow
+- ❌ EAS project not initialized in CI environment due to login failure
 - Type declaration dependencies are missing for React, React Native, NativeWind, and React Native Reanimated (tracked in issue #1)
 - Legacy Expo CLI warnings about Node +17 support (should be migrated to newer Expo CLI)
 
@@ -310,10 +300,10 @@ The "vividwealth" organization and the "vividwealth-app" repository do not exist
 - [ ] CODECOV_TOKEN (Not configured - repository doesn't exist)
 
 ## Latest CI Run Status
-- **Date:** April 17, 2025
-- **Run ID:** 14520429053
+- **Date:** April 18, 2025
+- **Run ID:** 14520601744
 - **Job Statuses:**
-  - lint-and-test: ✅ SUCCESS (completed in 39 seconds)
+  - lint-and-test: ✅ SUCCESS (completed in 50 seconds)
   - security-scan: ✅ SUCCESS
   - build-test: ❌ FAILED (during "Setup Expo" step)
 
@@ -365,7 +355,8 @@ The "vividwealth" organization and the "vividwealth-app" repository do not exist
 ## Known Issues
 - ~Expo authentication failing with 401 error~ (Fixed with pull_request_target update - verified working)
 - ~EAS.json configuration has invalid "hooks" property causing build failures~ (Fixed by removing hooks property)
-- ❌ EAS project not initialized in CI environment - must run 'eas init' in workflow
+- ❌ EAS login command has incorrect syntax in CI workflow
+- ❌ EAS project not initialized in CI environment due to login failure
 - Type declaration dependencies are missing for React, React Native, NativeWind, and React Native Reanimated (tracked in issue #1)
 - Legacy Expo CLI warnings about Node +17 support (should be migrated to newer Expo CLI)
 
