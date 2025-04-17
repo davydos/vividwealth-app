@@ -28,7 +28,11 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
+      
+      - uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}-v1
       
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
@@ -63,7 +67,11 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
+      
+      - uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}-v1
       
       - name: Run npm audit
         run: npm audit --production || true
@@ -89,7 +97,11 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
+      
+      - uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}-v1
       
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
