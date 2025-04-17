@@ -1,0 +1,28 @@
+name: Deploy Video API
+
+on:
+  push:
+    branches: [ develop ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build Docker image
+        run: docker build -t your-docker-username/vividwealth-video-api:${{ github.sha }} packages/video-api
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Push Docker image
+        run: docker push your-docker-username/vividwealth-video-api:${{ github.sha }}
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger deployment
+        run: |
+          # e.g. using ssh/rsync or Cloud Run gcloud commands
+          echo "Deploy logic here" 
