@@ -25,6 +25,8 @@
 - Issue is that EXPO_TOKEN is set in the environment, which prevents username/password authentication
 - Cache restoration failing with 422 errors: "Failed to restore: Cache service responded with 422"
 - Failed to save cache: "This legacy service is shutting down, effective April 15, 2025"
+- ❌ Android credentials import failing with: "Generating a new Keystore is not supported in --non‑interactive mode"
+- ✅ Fixed Android credentials import by changing command to `npx eas-cli credentials:upload`
 
 **Step Status:**
 1. **lint-and-test:**
@@ -44,6 +46,7 @@
    - ✅ Install EAS CLI: Passed
    - ❌ EAS login: Failed with error because EXPO_TOKEN was already set
    - ⏹️ Initialize EAS project: Not reached (previous step failed)
+   - ❌ Android credentials import: Failed with "Generating a new Keystore is not supported" (fixed by using credentials:upload)
    - ⏹️ Build Preview: Not reached (previous step failed)
 
 **Improvements Since Last Run:**
@@ -52,6 +55,7 @@
   - Sets EAS_PROJECT_ID environment variable
   - Initializes the EAS project with eas project:init command
 - ✅ Improved error handling for EAS project initialization
+- ✅ Fixed Android credentials import step by using appropriate command for CI environment
 
 **Fix Status:**
 - ✅ CodeQL v3 Update: Working (upgraded from v2)
@@ -59,6 +63,7 @@
 - ✅ EAS Project Init: Added to CI workflow (but not reached due to login failure)
 - ❌ EAS Login Command: Not working (syntax error with arguments)
 - ✅ Slack Notification: Removed from workflow (2025-04-17)
+- ✅ Android Credentials Import: Fixed by using credentials:upload instead of credentials:manager
 
 **Recent Code Changes:**
 - Commit `d225ed7`: "fix: move hooks to top level in eas.json to satisfy schema" (2025-04-17)
@@ -70,6 +75,8 @@
 - Commit `7923f14`: "fix: remove unused Font and COLORS from App.tsx" (2025-04-17)
 - Commit `621422c`: "fix: remove redundant Expo login step in CI workflow" (2025-04-17)
 - Commit `e9d3215`: "ci: use pull_request_target and conditional for Expo setup" (2025-04-17)
+- Commit `c6c6ead`: "Add Android credentials error information to workflow state" (2025-04-18)
+- Commit `xxxxx`: "fix: update Android credentials import step in CI workflow" (2025-04-18)
 
 **Next Steps:**
 1. Configure EAS project by running 'eas init' in the CI workflow
@@ -77,6 +84,7 @@
 3. Fix unused imports and variables
 4. Create the vividwealth organization and repository
 5. Push branches to the organization repository
+6. Fix Android credentials import step
 
 ## Organization Repository Status
 **Date:** 2025-04-17
@@ -125,6 +133,8 @@
 12. ❌ Fix EAS configuration in eas.json - remove or properly format "hooks" property
 13. ❌ Migrate to organization repository (pending organization creation)
 14. ✅ Removed Slack notification from CI workflow (commit: [date: 2025-04-17])
+15. ✅ Added Android keystore secrets to repository (2025-04-18)
+16. ✅ Fixed Android credentials import step in CI workflow (2025-04-18)
 
 ## Repository Secrets Audit
 **Date:** 2025-04-18
@@ -197,6 +207,7 @@
 - Committed leftover changes on feature/goal-assessment branch (2025-04-18)
 - Merged PR #5 "feat: video generation pipeline with mock client" into develop branch (2025-04-18)
 - ✅ Added Android keystore import step to CI workflow (2025-04-18)
+- ✅ Fixed Android credentials import step by changing to credentials:upload command (2025-04-18)
 
 ## Blockers
 - Need organization "vividwealth" to be created (temporarily using personal account)
@@ -207,6 +218,7 @@
 - ~EAS configuration validation error: "hooks" property in eas.json is not allowed~ (Fixed by removing hooks property)
 - ❌ EAS login command failing with syntax error (unexpected arguments)
 - ❌ EAS project not initialized in CI environment due to login failure
+- ❌ Android build failing with credential issues (fixed Android credentials import step in CI workflow)
 
 ## Recommendations
 1. Create GitHub organization "vividwealth" and transfer the repository
@@ -230,6 +242,7 @@
 - ~EAS.json configuration has invalid "hooks" property causing build failures~ (Fixed by removing hooks property)
 - ~EAS login command has incorrect syntax in CI workflow~ (Fixed by removing redundant login step - 2025-04-18)
 - ~GitHub Actions cache service warning about impending shutdown~ (Fixed by upgrading to actions/cache@v4 - 2025-04-18)
+- ~Android credentials import failing in CI environment~ (Fixed by updating import command - 2025-04-18)
 - ❌ EAS project not initialized in CI environment due to login failure
 - Type declaration dependencies are missing for React, React Native, NativeWind, and React Native Reanimated (tracked in issue #1)
 - Legacy Expo CLI warnings about Node +17 support (should be migrated to newer Expo CLI)
@@ -368,6 +381,7 @@ The "vividwealth" organization and the "vividwealth-app" repository do not exist
 - ~EAS.json configuration has invalid "hooks" property causing build failures~ (Fixed by removing hooks property)
 - ~EAS login command has incorrect syntax in CI workflow~ (Fixed by removing redundant login step - 2025-04-18)
 - ~GitHub Actions cache service warning about impending shutdown~ (Fixed by upgrading to actions/cache@v4 - 2025-04-18)
+- ~Android credentials import failing in CI environment~ (Fixed by updating import command - 2025-04-18)
 - ❌ EAS project not initialized in CI environment due to login failure
 - Type declaration dependencies are missing for React, React Native, NativeWind, and React Native Reanimated (tracked in issue #1)
 - Legacy Expo CLI warnings about Node +17 support (should be migrated to newer Expo CLI)
