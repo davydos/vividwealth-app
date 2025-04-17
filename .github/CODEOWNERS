@@ -1,0 +1,18 @@
+# Global code owners
+* @davydos
+
+# CI/CD Workflows
+.github/workflows/ @davydos
+
+# App source code
+/src/ @davydos
+
+# Build configuration
+eas.json @davydos
+app.json @davydos
+
+# Testing
+*.test.* @davydos
+
+# Documentation
+*.md @davydos 
