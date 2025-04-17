@@ -1,6 +1,7 @@
 /**
  * Utility functions for generating video content based on user goals
  */
+import Constants from 'expo-constants';
 
 /**
  * Builds a prompt for AI video generation based on a user's goal and timeframe
@@ -45,8 +46,9 @@ export async function generateVisualization(goal: string, timeframeDays: number)
  * @returns Promise resolving to a video URL string
  */
 export async function fetchVisualizationVideo(goal: string, timeframe: number): Promise<string> {
+  const API_URL = Constants.expoConfig.extra.VIDEO_API_URL;
   const prompt = await generateTextPrompt(goal, timeframe);
-  const { videoUrl } = await fetch('https://your-video-api/generate-video', {
+  const { videoUrl } = await fetch(API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ prompt }),
