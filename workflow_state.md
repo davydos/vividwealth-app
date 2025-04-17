@@ -10,19 +10,25 @@
 **Run ID:** 14516312994
 **Workflow:** VividWealth CI
 **Branch:** develop
-**Last Rerun Time:** 2025-04-17 (Current)
+**Last Rerun Time:** 2025-04-17
 **Latest Change:** Updated workflow to use pull_request_target instead of pull_request
 
 **Job Status:**
-- ⏳ lint-and-test: Running
-- ⏳ security-scan: Pending
-- ⏳ build-test: Pending
+- ✅ lint-and-test: Passed (50s)
+- ✅ security-scan: Passed (1m5s)
+- ❌ build-test: Failed (1m36s)
 
 **Workflow Trigger Updates:**
 - ✅ Changed workflow trigger from `pull_request` to `pull_request_target` to ensure secrets are accessible for external PRs
 - ✅ Modified conditional checks in security-scan and build-test jobs to include pull_request_target
-- ✅ Expo authentication will now run with full access to repository secrets even for fork PRs
-- ✅ This change ensures the EXPO_TOKEN is properly passed to the Expo GitHub Action
+- ✅ Expo authentication now running properly with full access to repository secrets
+- ✅ Confirmed authentication working: "smrteth (authenticated using EXPO_TOKEN)"
+
+**Error Details:**
+- ❌ The build-test job is now failing with "eas.json is not valid. - 'hooks' is not allowed"
+- This is a schema validation error in the EAS configuration
+- The issue is unrelated to the authentication setup which is now working correctly
+- The Expo token is valid and authenticating successfully
 
 **Step Status:**
 1. **lint-and-test:**
@@ -48,11 +54,6 @@
    - ❌ Build Preview: Failed with "eas.json is not valid. - 'hooks' is not allowed"
    - ⏹️ Create Status Check: Not reached
 
-**Error Details:**
-- The build-test job failed because `eas.json` is not valid - specifically, the "hooks" property is not allowed
-- This is likely due to a schema validation error in the Expo Application Services configuration
-- The issue is unrelated to our authentication and cache fixes
-  
 **Improvements Since Last Run:**
 - ✅ Fixed linting issues: Converted `require()` to ES6 import in Loader.tsx
 - ✅ Fixed escaped apostrophe in ErrorBoundary.tsx by replacing `We're` with `We&apos;re`
@@ -135,9 +136,10 @@
 8. ✅ Added remote for organization repository (org-origin)
 9. ✅ Committed leftover changes on feature/goal-assessment branch (commit: [date: 2025-04-18])
 10. ✅ Updated CI workflow to use pull_request_target for secure access to secrets (commit: e9d3215 [date: 2025-04-17])
-11. ❌ Migrate to organization repository (pending organization creation)
-12. ❌ Fix Expo authentication issues (potentially fixed with pull_request_target update - verification pending)
-13. ✅ Removed Slack notification from CI workflow (commit: [date: 2025-04-17])
+11. ✅ Fixed Expo authentication issues by using pull_request_target (verified working)
+12. ❌ Fix EAS configuration in eas.json - remove or properly format "hooks" property
+13. ❌ Migrate to organization repository (pending organization creation)
+14. ✅ Removed Slack notification from CI workflow (commit: [date: 2025-04-17])
 
 ## Repository Secrets Audit
 **Date:** 2025-04-17
@@ -203,24 +205,25 @@
 - ~Branch protection rules need to be set up manually via GitHub web interface~ (Completed)
 - Repository secrets need to be configured manually via GitHub web interface (Completed for davydos/vividwealth-app)
 - All required secrets are missing from the organization repository (pending repository creation)
-- Expo authentication failing with 401 error (potentially fixed with pull_request_target update - verification pending)
+- ~Expo authentication failing with 401 error~ (Fixed with pull_request_target update - verified working)
+- ❌ EAS configuration validation error: "hooks" property in eas.json is not allowed
 
 ## Recommendations
 1. Create GitHub organization "vividwealth" and transfer the repository
 2. ~Complete the manual branch protection setup for main and develop branches~ (Completed)
 3. Fix Expo authentication issues:
    - ✅ Updated workflow to use pull_request_target to ensure secrets are accessible for external PRs
-   - Verify EXPO_TOKEN format (should be a valid Expo token)
-   - Regenerate a new EXPO_TOKEN from the Expo developer dashboard if issues persist
-   - Check that EXPO_USERNAME and EXPO_PASSWORD match the account that generated the token
-   - Consider temporarily using a personal access token for CI instead of username/password
-4. Remove SLACK_WEBHOOK_URL secret as it's no longer needed
-5. Complete setup of GitHub Project board for task tracking
-6. After fixing authentication issues, rerun the CI workflow to validate
+   - ✅ Verified EXPO_TOKEN is working correctly with successful authentication
+4. Fix EAS configuration validation:
+   - Update eas.json file to remove or properly format the "hooks" property
+   - Validate eas.json against the EAS schema
+5. Remove SLACK_WEBHOOK_URL secret as it's no longer needed
+6. Complete setup of GitHub Project board for task tracking
 7. Implement required type declarations for React, React Native, and other libraries to fix linter errors
 
 ## Known Issues
-- Expo authentication failing with 401 error (potentially fixed with pull_request_target update - verification pending)
+- ~Expo authentication failing with 401 error~ (Fixed with pull_request_target update - verified working)
+- ❌ EAS.json configuration has invalid "hooks" property causing build failures
 - Type declaration dependencies are missing for React, React Native, NativeWind, and React Native Reanimated (tracked in issue #1)
 - Legacy Expo CLI warnings about Node +17 support (should be migrated to newer Expo CLI)
 
@@ -354,7 +357,8 @@ The "vividwealth" organization and the "vividwealth-app" repository do not exist
 5. Trigger a new workflow run
 
 ## Known Issues
-- Expo authentication failing with 401 error (potentially fixed with pull_request_target update - verification pending)
+- ~Expo authentication failing with 401 error~ (Fixed with pull_request_target update - verified working)
+- ❌ EAS.json configuration has invalid "hooks" property causing build failures
 - Type declaration dependencies are missing for React, React Native, NativeWind, and React Native Reanimated (tracked in issue #1)
 - Legacy Expo CLI warnings about Node +17 support (should be migrated to newer Expo CLI)
 
