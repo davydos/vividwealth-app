@@ -14,6 +14,19 @@ export function buildVideoPrompt(goal: string, timeframeDays: number): string {
 }
 
 /**
+ * Generates a text prompt for video generation based on user's goal and timeframe
+ * 
+ * @param goal - The user's goal text
+ * @param timeframeDays - The timeframe for achieving the goal in days
+ * @returns Promise resolving to a formatted prompt string
+ */
+export async function generateTextPrompt(goal: string, timeframe: number): Promise<string> {
+  // Enhance the prompt with relevant details based on the goal type and timeframe
+  const enhancedPrompt = `Create a motivational visualization showing the journey of achieving "${goal}" over ${timeframe} days, with luxury aesthetics and inspiring scenes.`;
+  return enhancedPrompt;
+}
+
+/**
  * Generates a visualization for a goal using guided visualization and affirmations
  * 
  * @param goal - The user's goal text
@@ -21,20 +34,22 @@ export function buildVideoPrompt(goal: string, timeframeDays: number): string {
  * @returns Promise resolving to a video URL string
  */
 export async function generateVisualization(goal: string, timeframeDays: number): Promise<string> {
-  const prompt = `Through powerful guided visualization and affirmations, manifest the goal "${goal}" over ${timeframeDays} days with immersive, magical scenes and clear instructions.`;
-  
-  // Call the video generation service with the prompt
-  // This is a mock implementation - in a real app, this would call a real video generation API
-  const videoUrl = await generateVideo({ prompt });
-  return videoUrl;
+  return fetchVisualizationVideo(goal, timeframeDays);
 }
 
-// Mock implementation of generateVideo for the new function
-// In a real implementation, this would call the actual video generation API
-async function generateVideo({ prompt }: { prompt: string }): Promise<string> {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  // Mock response with a fake video URL
-  return `https://example.com/visualizations/goal-${Date.now()}.mp4`;
+/**
+ * Fetches a visualization video from the video API service
+ * 
+ * @param goal - The user's goal text
+ * @param timeframe - The timeframe for achieving the goal in days
+ * @returns Promise resolving to a video URL string
+ */
+export async function fetchVisualizationVideo(goal: string, timeframe: number): Promise<string> {
+  const prompt = await generateTextPrompt(goal, timeframe);
+  const { videoUrl } = await fetch('https://your-video-api/generate-video', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt }),
+  }).then(r => r.json());
+  return videoUrl;
 } 
