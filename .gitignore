@@ -42,4 +42,12 @@ yarn-error.log*
 Thumbs.db
 
 # Ignore VividWealth subdirectory as it's a separate repo
-VividWealth/ 
+VividWealth/
+
+# Python virtual environments
+venv/
+**/venv/
+.env/
+.venv/
+__pycache__/
+*.py[cod] 
