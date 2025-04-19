@@ -1,95 +1,42 @@
 import * as SecureStore from 'expo-secure-store';
 
-// Key constants for storing different types of data
-const KEYS = {
-  AUTH_TOKEN: 'auth_token',
-  USER_DATA: 'user_data',
-  REFRESH_TOKEN: 'refresh_token',
-};
+const AUTH_TOKEN_KEY = 'auth_token';
+const USER_DATA_KEY = 'user_data';
 
 /**
  * Save authentication token to secure storage
  */
-export const saveAuthToken = async (token: string): Promise<void> => {
-  try {
-    await SecureStore.setItemAsync(KEYS.AUTH_TOKEN, token);
-  } catch (error) {
-    console.error('Error saving auth token:', error);
-    throw error;
-  }
-};
+export async function saveAuthToken(token: string): Promise<void> {
+  await SecureStore.setItemAsync(AUTH_TOKEN_KEY, token);
+}
 
 /**
  * Get authentication token from secure storage
  */
-export const getAuthToken = async (): Promise<string | null> => {
-  try {
-    return await SecureStore.getItemAsync(KEYS.AUTH_TOKEN);
-  } catch (error) {
-    console.error('Error getting auth token:', error);
-    return null;
-  }
-};
-
-/**
- * Save refresh token to secure storage
- */
-export const saveRefreshToken = async (token: string): Promise<void> => {
-  try {
-    await SecureStore.setItemAsync(KEYS.REFRESH_TOKEN, token);
-  } catch (error) {
-    console.error('Error saving refresh token:', error);
-    throw error;
-  }
-};
-
-/**
- * Get refresh token from secure storage
- */
-export const getRefreshToken = async (): Promise<string | null> => {
-  try {
-    return await SecureStore.getItemAsync(KEYS.REFRESH_TOKEN);
-  } catch (error) {
-    console.error('Error getting refresh token:', error);
-    return null;
-  }
-};
+export async function getAuthToken(): Promise<string | null> {
+  return await SecureStore.getItemAsync(AUTH_TOKEN_KEY);
+}
 
 /**
  * Save user data to secure storage
  */
-export const saveUserData = async (userData: object): Promise<void> => {
-  try {
-    await SecureStore.setItemAsync(KEYS.USER_DATA, JSON.stringify(userData));
-  } catch (error) {
-    console.error('Error saving user data:', error);
-    throw error;
-  }
-};
+export async function saveUserData(userData: any): Promise<void> {
+  await SecureStore.setItemAsync(USER_DATA_KEY, JSON.stringify(userData));
+}
 
 /**
  * Get user data from secure storage
  */
-export const getUserData = async (): Promise<any | null> => {
-  try {
-    const userData = await SecureStore.getItemAsync(KEYS.USER_DATA);
-    return userData ? JSON.parse(userData) : null;
-  } catch (error) {
-    console.error('Error getting user data:', error);
-    return null;
-  }
-};
+export async function getUserData(): Promise<any | null> {
+  const userData = await SecureStore.getItemAsync(USER_DATA_KEY);
+  if (!userData) return null;
+  return JSON.parse(userData);
+}
 
 /**
  * Clear all authentication related data from secure storage
  */
-export const clearAuthData = async (): Promise<void> => {
-  try {
-    await SecureStore.deleteItemAsync(KEYS.AUTH_TOKEN);
-    await SecureStore.deleteItemAsync(KEYS.REFRESH_TOKEN);
-    await SecureStore.deleteItemAsync(KEYS.USER_DATA);
-  } catch (error) {
-    console.error('Error clearing auth data:', error);
-    throw error;
-  }
-}; 
+export async function clearAuthData(): Promise<void> {
+  await SecureStore.deleteItemAsync(AUTH_TOKEN_KEY);
+  await SecureStore.deleteItemAsync(USER_DATA_KEY);
+} 

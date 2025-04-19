@@ -12,12 +12,19 @@ export async function incrementStreak(): Promise<number> {
   const today = new Date().toISOString().slice(0,10);
   const last = await AsyncStorage.getItem(LAST_DATE_KEY);
   let streak = await getStreak();
+  
+  // If already updated today, return current streak
   if (last === today) return streak;
-  if (last === new Date(Date.now() - 86400000).toISOString().slice(0,10)) {
+  
+  // If last update was yesterday, increment streak
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+  if (last === yesterday) {
     streak += 1;
   } else {
+    // Reset streak for any other case
     streak = 1;
   }
+  
   await AsyncStorage.setItem(STREAK_KEY, streak.toString());
   await AsyncStorage.setItem(LAST_DATE_KEY, today);
   return streak;

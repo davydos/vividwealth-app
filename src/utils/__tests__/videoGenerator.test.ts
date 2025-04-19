@@ -1,10 +1,23 @@
 import { buildVideoPrompt, generateVisualization } from '../videoGenerator';
 
-// Speed up tests by bypassing setTimeout
-jest.mock('global', () => ({
-  ...global,
-  setTimeout: (callback: Function) => callback(),
+// Mock Expo Constants
+jest.mock('expo-constants', () => ({
+  expoConfig: {
+    extra: {
+      VIDEO_API_URL: 'https://example.com/api/videos'
+    }
+  }
 }));
+
+// Speed up tests by mocking setTimeout directly
+jest.useFakeTimers();
+
+// Mock fetch API
+global.fetch = jest.fn().mockImplementation(() => 
+  Promise.resolve({
+    json: () => Promise.resolve({ videoUrl: 'https://example.com/visualizations/goal-12345.mp4' }),
+  })
+);
 
 describe('videoGenerator', () => {
   test('buildVideoPrompt formats prompt correctly', () => {
@@ -25,6 +38,9 @@ describe('videoGenerator', () => {
     
     // Act
     const url = await generateVisualization(goal, timeframeDays);
+    
+    // Advance all timers to resolve any pending promises
+    jest.runAllTimers();
     
     // Assert
     expect(url).toBeDefined();

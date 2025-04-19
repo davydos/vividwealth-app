@@ -8,6 +8,7 @@ import { styled } from 'nativewind';
 // Import DashboardScreen
 import DashboardScreen from '../screens/DashboardScreen';
 import SubscriptionScreen from '../screens/SubscriptionScreen';
+import UserProfileSettings from '../screens/UserProfileSettings';
 
 // Temporarily create placeholder screens
 const StudioScreen = () => null;
@@ -96,6 +97,18 @@ export const MainNavigator = () => {
               <StyledText className="text-xl">⚙️</StyledText>
             </StyledView>
           ),
+        }}
+      />
+      <Tab.Screen 
+        name="UserProfileSettings" 
+        component={UserProfileSettings}
+        options={{
+          tabBarIcon: ({ color, focused }) => (
+            <StyledView className={`items-center justify-center rounded-full p-1 ${focused ? 'bg-accent/20' : ''}`}>
+              <StyledText className="text-xl">👤</StyledText>
+            </StyledView>
+          ),
+          tabBarLabel: 'Profile Settings',
         }}
       />
     </Tab.Navigator>
