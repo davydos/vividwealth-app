@@ -14,6 +14,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "test:backend": "jest __tests__/api-gateway && (cd ai-orchestrator && ./venv/bin/python -m pytest -p no:warnings tests) && (cd video-generator && ./venv/bin/python -m pytest -p no:warnings tests)",
+    "test:frontend": "jest __tests__/frontend",
+    "test:sanity": "jest __tests__/frontend/sanity.test.ts --no-cache",
     "deploy": "eas build --platform all --profile production",
     "deploy:preview": "eas build --platform all --profile preview",
     "prepare": "chmod +x ./scripts/rollback.sh"
@@ -63,6 +66,7 @@
     "expo-doctor": "^1.12.8",
     "jest": "^29.7.0",
     "jest-expo": "~52.0.0",
+    "ts-jest": "^29.3.2",
     "typescript": "^5.3.3"
   },
   "private": true

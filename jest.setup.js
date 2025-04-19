@@ -1,9 +1,6 @@
 // Setup file for Jest tests
 import '@testing-library/jest-native/extend-expect';
 
-// Mock Animated
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
-
 // Mock AsyncStorage for tests
 jest.mock('@react-native-async-storage/async-storage', () => ({
   getItem: jest.fn(),
@@ -13,16 +10,34 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
   getAllKeys: jest.fn(),
 }));
 
-// Mock Reanimated
-jest.mock('react-native-reanimated', () => {
-  const Reanimated = require('react-native-reanimated/mock');
-  // The mock for `call` immediately calls the callback which is incorrect
-  // So we override it with a no-op
-  Reanimated.default.call = () => {};
-  return Reanimated;
-});
-
-// Silence the warnings for React Native usage
+// Silence React Native warnings
 jest.mock('react-native/Libraries/LogBox/LogBox', () => ({
   ignoreLogs: jest.fn(),
-})); 
+}));
+
+// Basic mocks for React Native components and modules
+jest.mock('react-native', () => {
+  return {
+    NativeModules: {
+      UIManager: {
+        RCTView: () => {},
+      },
+      SettingsManager: {},
+    },
+    NativeAnimatedModule: {},
+    Text: jest.fn().mockImplementation(() => null),
+    TextInput: jest.fn().mockImplementation(() => null),
+    View: jest.fn().mockImplementation(() => null),
+    TouchableOpacity: jest.fn().mockImplementation(() => null),
+  };
+});
+
+// Clean up timers after each test
+afterEach(() => {
+  jest.clearAllTimers();
+});
+
+// Restore real timers when all tests are done
+afterAll(() => {
+  jest.useRealTimers();
+}); 

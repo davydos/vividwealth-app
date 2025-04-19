@@ -21,7 +21,7 @@ describe('calculateTimeframe', () => {
   });
 
   test('handles goals with special characters and spaces', () => {
-    expect(calculateTimeframe('Learn to play piano!')).toBe(190); // 19 chars * 10 = 190 days
+    expect(calculateTimeframe('Learn to play piano!')).toBe(200); // 20 chars * 10 = 200 days
     expect(calculateTimeframe('Start a business in 2023')).toBe(240); // 24 chars * 10 = 240 days
   });
 }); 

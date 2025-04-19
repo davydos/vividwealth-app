@@ -55,6 +55,7 @@ export enum NavigationRoutes {
   STUDIO = 'Studio',
   PROFILE = 'Profile',
   SETTINGS = 'Settings',
+  USER_PROFILE_SETTINGS = 'UserProfileSettings',
 }
 
 // Export navigation types

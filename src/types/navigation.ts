@@ -27,6 +27,7 @@ export type MainTabParamList = {
   Subscription: undefined;
   Profile: undefined;
   Settings: undefined;
+  UserProfileSettings: undefined;
 };
 
 // Helper type for Stack Screen props
